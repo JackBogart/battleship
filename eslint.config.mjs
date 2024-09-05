@@ -79,6 +79,7 @@ export default [
       'radix': 'error',
       'sort-imports': 'error',
       'yoda': ['error', 'never', { exceptRange: true }],
+      'curly': 'error',
     },
   },
   {
