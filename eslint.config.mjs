@@ -17,7 +17,6 @@ export default [
       'arrow-body-style': [
         'error',
         'as-needed',
-        { requireReturnForObjectLiteral: true },
       ],
       'block-scoped-var': 'error',
       'default-case': 'error',
