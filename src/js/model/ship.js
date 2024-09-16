@@ -1,24 +1,17 @@
 export default function createShip(length) {
-  if (!(2 <= length && length <= 5)) {
-    throw new Error('Invalid ship length');
+  if (length <= 0 || length > 5) {
+    throw new Error('Invalid length');
   }
 
   let hits = 0;
 
-  function isSunk() {
-    return hits === length;
-  }
-
-  function hit() {
-    if (isSunk()) {
-      throw new Error('Cannot hit sunken ship');
+  const getLength = () => length;
+  const isSunk = () => hits === length;
+  const hit = () => {
+    if (!isSunk()) {
+      hits += 1;
     }
-    hits += 1;
-  }
-
-  return {
-    getLength: () => length,
-    isSunk,
-    hit,
   };
+
+  return { getLength, isSunk, hit };
 }

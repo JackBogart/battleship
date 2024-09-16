@@ -1,54 +1,38 @@
 import createShip from './ship';
 
-describe('creating ships', () => {
-  test('createShip throws an error for ships smaller than 2', () => {
-    expect(() => createShip(1)).toThrow('Invalid ship length');
+describe('Ship', () => {
+  it('should return a length of 3', () => {
+    const ship = createShip(3);
+
+    const length = ship.getLength();
+
+    expect(length).toBe(3);
   });
 
-  test('createShip throws an error for ships larger than 5', () => {
-    expect(() => createShip(6)).toThrow('Invalid ship length');
+  it('should throw an error for negative length', () => {
+    expect(() => createShip(-1)).toThrow('Invalid length');
   });
 
-  test('createShip returns a ship object of length 2', () => {
-    const ship = createShip(2);
-
-    expect(ship.getLength()).toEqual(2);
+  it('should throw an error for length larger than 5', () => {
+    expect(() => createShip(6)).toThrow('Invalid length');
   });
 
-  test('createShip returns a ship object of length 5', () => {
-    const ship = createShip(5);
+  it('should not be sunk if hit fewer times than its length', () => {
+    const ship = createShip(3);
 
-    expect(ship.getLength()).toEqual(5);
-  });
-});
+    ship.hit();
+    ship.hit();
 
-describe('invoking ship methods', () => {
-  let ship;
-
-  beforeEach(() => {
-    ship = createShip(2);
-  });
-
-  test('isSunk returns false when the ship is not sunk', () => {
     expect(ship.isSunk()).toBe(false);
   });
 
-  test('hit does not throw an error on active ship', () => {
-    expect(() => ship.hit()).not.toThrow();
-  });
+  it('should be sunk if hit equal to its length', () => {
+    const ship = createShip(3);
 
-  describe('invoking ship methods on sunken ship', () => {
-    beforeEach(() => {
-      ship.hit();
-      ship.hit();
-    });
+    ship.hit();
+    ship.hit();
+    ship.hit();
 
-    test('isSunk returns true when the ship is sunk', () => {
-      expect(ship.isSunk()).toBe(true);
-    });
-
-    test('hit throws an error on sunken ship', () => {
-      expect(() => ship.hit()).toThrow('Cannot hit sunken ship');
-    });
+    expect(ship.isSunk()).toBe(true);
   });
 });
