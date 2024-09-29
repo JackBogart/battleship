@@ -1,4 +1,4 @@
-export default function createShip(length) {
+export function createShip(length) {
   if (length <= 0 || length > 5) {
     throw new Error('Invalid length');
   }

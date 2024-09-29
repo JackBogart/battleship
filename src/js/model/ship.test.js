@@ -1,4 +1,4 @@
-import createShip from './ship';
+import { createShip } from './ship';
 
 describe('Ship', () => {
   it('should return a length of 3', () => {

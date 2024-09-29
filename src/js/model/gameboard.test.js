@@ -1,13 +1,14 @@
-import { createGameboard, TileInfo } from './gameboard';
-import createShip from './ship';
+import { TileInfo } from './gameboard';
+import { createGameboard } from './gameboard';
+import { createShip } from './ship';
 
-jest.mock('./ship', () =>
-  jest.fn((length) => ({
+jest.mock('./ship', () => ({
+  createShip: jest.fn((length) => ({
     getLength: jest.fn().mockReturnValue(length),
     isSunk: jest.fn(),
     hit: jest.fn(),
   })),
-);
+}));
 
 let gameboard;
 

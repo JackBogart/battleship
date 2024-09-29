@@ -17,15 +17,15 @@ export function createGameboard() {
     .fill(null)
     .map(() => new Array(cols).fill(TileInfo.UNKNOWN));
 
-  function getShip(row, col) {
+  const getShip = (row, col) => {
     if (row < 0 || row >= rows || col < 0 || col >= cols) {
       throw new Error('Cannot get ship out of bounds');
     }
 
     return board[row][col];
-  }
+  };
 
-  function setShip(ship, row, col, isVertical = false) {
+  const setShip = (ship, row, col, isVertical = false) => {
     if (row < 0 || row >= rows || col < 0 || col >= cols) {
       throw new Error('Cannot place ship out of bounds');
     }
@@ -59,17 +59,12 @@ export function createGameboard() {
     ships.push(ship);
 
     return true;
-  }
+  };
 
-  function getInfoBoard() {
-    return infoBoard.map((row) => [...row]);
-  }
+  const getInfoBoard = () => infoBoard.map((row) => [...row]);
+  const getTileInfo = (row, col) => infoBoard[row][col];
 
-  function getTileInfo(row, col) {
-    return infoBoard[row][col];
-  }
-
-  function receiveAttack(row, col) {
+  const receiveAttack = (row, col) => {
     if (row < 0 || row >= rows || col < 0 || col >= cols) {
       throw new Error('Cannot attack ship out of bounds');
     }
@@ -86,11 +81,9 @@ export function createGameboard() {
     }
 
     return true;
-  }
+  };
 
-  function isFleetSunk() {
-    return ships.every((ship) => ship.isSunk());
-  }
+  const isFleetSunk = () => ships.every((ship) => ship.isSunk());
 
   return {
     getShip,
