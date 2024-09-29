@@ -7,5 +7,9 @@
   "singleQuote": true,
   "tabWidth": 2,
   "trailingComma": "all",
-  "useTabs": false
+  "useTabs": false,
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": ["'^[./]'"],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
 }
