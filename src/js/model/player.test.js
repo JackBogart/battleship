@@ -56,7 +56,7 @@ describe('player', () => {
 
     player.setShip(ship, 1, 2);
 
-    expect(gameboardInstance.setShip).toHaveBeenCalledWith(ship, 1, 2);
+    expect(gameboardInstance.setShip).toHaveBeenCalledWith(ship, 1, 2, false);
   });
 
   it('should attack a ship at the specified location', () => {
