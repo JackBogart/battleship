@@ -1,5 +1,4 @@
-import { TileInfo } from './gameboard';
-import { createGameboard } from './gameboard';
+import { TileInfo, createGameboard } from './gameboard';
 import { createShip } from './ship';
 
 jest.mock('./ship', () => ({
