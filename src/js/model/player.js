@@ -14,8 +14,8 @@ export function createPlayer(name, playerType) {
   };
   const getPlayerType = () => playerType;
   const getShip = (row, col) => gameboard.getShip(row, col);
-  const setShip = (ship, row, col) => {
-    gameboard.setShip(ship, row, col);
+  const setShip = (ship, row, col, isVertical = false) => {
+    gameboard.setShip(ship, row, col, isVertical);
   };
   const getInfoBoard = () => gameboard.getInfoBoard();
   const getTileInfo = (row, col) => gameboard.getTileInfo(row, col);
