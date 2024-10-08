@@ -11,6 +11,7 @@ export default [
     },
     rules: {
       'no-constructor-return': 'error',
+      'no-duplicate-imports': 'error',
       'no-use-before-define': ["error", { functions: false,}],
       'no-useless-assignment': 'error',
       'arrow-body-style': [
@@ -75,6 +76,7 @@ export default [
       'prefer-rest-params': 'error',
       'prefer-template': 'error',
       'radix': 'error',
+      'sort-imports': ['error', {ignoreCase: true}],
       'yoda': ['error', 'never', { exceptRange: true }],
       'curly': 'error',
     },
