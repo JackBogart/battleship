@@ -1,23 +1,21 @@
-import eslintConfigPrettier from 'eslint-config-prettier';
-import globals from 'globals';
 import pluginJs from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier';
+import importPlugin from 'eslint-plugin-import';
+import globals from 'globals';
 
 export default [
   eslintConfigPrettier,
   pluginJs.configs.recommended,
+  importPlugin.flatConfigs.recommended,
   {
     languageOptions: {
       globals: globals.browser,
     },
     rules: {
       'no-constructor-return': 'error',
-      'no-duplicate-imports': 'error',
-      'no-use-before-define': ["error", { functions: false,}],
+      'no-use-before-define': ['error', { functions: false }],
       'no-useless-assignment': 'error',
-      'arrow-body-style': [
-        'error',
-        'as-needed',
-      ],
+      'arrow-body-style': ['error', 'as-needed'],
       'block-scoped-var': 'error',
       'default-case': 'error',
       'default-case-last': 'error',
@@ -66,7 +64,7 @@ export default [
       'no-var': 'error',
       'no-void': 'error',
       'object-shorthand': 'error',
-      'one-var': ['error', { initialized: "never", uninitialized: "always" }],
+      'one-var': ['error', { initialized: 'never', uninitialized: 'always' }],
       'operator-assignment': ['error', 'always'],
       'prefer-exponentiation-operator': 'error',
       'prefer-numeric-literals': 'error',
@@ -76,9 +74,31 @@ export default [
       'prefer-rest-params': 'error',
       'prefer-template': 'error',
       'radix': 'error',
-      'sort-imports': ['error', {ignoreCase: true}],
       'yoda': ['error', 'never', { exceptRange: true }],
       'curly': 'error',
+      'import/order': [
+        'error',
+        {
+          groups: [
+            'builtin',
+            'external',
+            'internal',
+            ['parent', 'sibling', 'index'],
+          ],
+          'newlines-between': 'always',
+          alphabetize: {
+            order: 'asc',
+            caseInsensitive: false,
+          },
+        },
+      ],
+      'sort-imports': [
+        'error',
+        {
+          ignoreDeclarationSort: true,
+          ignoreMemberSort: false,
+        },
+      ],
     },
   },
   {
