@@ -36,8 +36,9 @@ body {
   flex-grow: 1;
   color: black;
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  gap: 150px;
 }
 
 .gameboards {
@@ -55,6 +56,22 @@ body {
 
 .gameboard > * {
   border: 1px solid black;
+}
+
+.current-turn {
+  font-size: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 100px;
+}
+
+.hit-cell {
+  background: url('../img/hit-marker.svg') center center no-repeat;
+}
+
+.miss-cell {
+  background: url('../img/miss-marker.svg') center center no-repeat;
 }
 
 .github-banner {
