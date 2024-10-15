@@ -21,6 +21,8 @@ export function createPlayer(name, playerType) {
   const getTileInfo = (row, col) => gameboard.getTileInfo(row, col);
   const receiveAttack = (row, col) => gameboard.receiveAttack(row, col);
   const isFleetSunk = () => gameboard.isFleetSunk();
+  const isValidPlacement = (ship, row, col, isVertical) =>
+    gameboard.isValidPlacement(ship, row, col, isVertical);
 
   return {
     getName,
@@ -32,5 +34,6 @@ export function createPlayer(name, playerType) {
     getTileInfo,
     receiveAttack,
     isFleetSunk,
+    isValidPlacement,
   };
 }
