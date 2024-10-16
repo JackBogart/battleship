@@ -79,14 +79,14 @@ export default [
       'import/order': [
         'error',
         {
-          groups: [
+          'groups': [
             'builtin',
             'external',
             'internal',
             ['parent', 'sibling', 'index'],
           ],
           'newlines-between': 'always',
-          alphabetize: {
+          'alphabetize': {
             order: 'asc',
             caseInsensitive: false,
           },
