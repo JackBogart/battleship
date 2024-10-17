@@ -11,24 +11,23 @@
     'Open Sans',
     'Helvetica Neue',
     sans-serif;
-  font-size: 1.5rem;
   color: white;
   --header-background-color: hsl(229, 78%, 34%);
-  --grid-cell-size: 40px;
+  --grid-cell-size: 2.5rem;
 }
 
 body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 .header {
   background-color: var(--header-background-color);
   font-weight: 500;
   display: flex;
-  padding: 20px 100px;
+  font-size: 1.5rem;
+  padding: 1.25rem 6rem;
 }
 
 .content {
@@ -38,14 +37,16 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 150px;
+  justify-content: center;
+  gap: 9rem;
 }
 
 .gameboards {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 200px;
+  gap: 10rem;
+  margin-bottom: 1rem;
 }
 
 .gameboard {
@@ -55,7 +56,7 @@ body {
 }
 
 .gameboard > * {
-  border: 1px solid black;
+  border: 0.1rem solid black;
 }
 
 .current-turn {
@@ -63,7 +64,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 100px;
 }
 
 .hit-cell {
@@ -78,10 +78,9 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 10px;
+  padding: 0.625rem;
   background-color: hsl(0, 0%, 10%);
-  font-size: 0.7rem;
-  gap: 10px;
+  gap: 0.625rem;
 }
 
 .github-banner svg:hover:not(:active) {
