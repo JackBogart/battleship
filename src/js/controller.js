@@ -1,6 +1,6 @@
 import { TileInfo } from './model/gameboard';
 import { PlayerType, createPlayer } from './model/player';
-import { createShip } from './model/ship';
+import { ShipType, createShip } from './model/ship';
 import { createView } from './view';
 
 function placeShipRandomly(player, ship) {
@@ -18,17 +18,17 @@ function placeShipRandomly(player, ship) {
 }
 
 function tempInitBoards(player1, player2) {
-  placeShipRandomly(player1, createShip(4));
-  placeShipRandomly(player1, createShip(3));
-  placeShipRandomly(player1, createShip(5));
-  placeShipRandomly(player1, createShip(3));
-  placeShipRandomly(player1, createShip(2));
+  placeShipRandomly(player1, createShip(ShipType.CARRIER));
+  placeShipRandomly(player1, createShip(ShipType.BATTLESHIP));
+  placeShipRandomly(player1, createShip(ShipType.DESTROYER));
+  placeShipRandomly(player1, createShip(ShipType.SUBMARINE));
+  placeShipRandomly(player1, createShip(ShipType.PATROL_BOAT));
 
-  placeShipRandomly(player2, createShip(4));
-  placeShipRandomly(player2, createShip(3));
-  placeShipRandomly(player2, createShip(5));
-  placeShipRandomly(player2, createShip(3));
-  placeShipRandomly(player2, createShip(2));
+  placeShipRandomly(player2, createShip(ShipType.CARRIER));
+  placeShipRandomly(player2, createShip(ShipType.BATTLESHIP));
+  placeShipRandomly(player2, createShip(ShipType.DESTROYER));
+  placeShipRandomly(player2, createShip(ShipType.SUBMARINE));
+  placeShipRandomly(player2, createShip(ShipType.PATROL_BOAT));
 }
 
 function getRandomInt(max) {

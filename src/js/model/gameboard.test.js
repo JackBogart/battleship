@@ -2,21 +2,20 @@ import { TileInfo, createGameboard } from './gameboard';
 import { createShip } from './ship';
 
 jest.mock('./ship', () => ({
-  createShip: jest.fn((length) => ({
-    getLength: jest.fn().mockReturnValue(length),
-    isSunk: jest.fn(),
-    hit: jest.fn(),
-  })),
+  createShip: jest.fn(),
+}));
+
+createShip.mockImplementation((shipType) => ({
+  isSunk: jest.fn(),
+  hit: jest.fn(),
+  getLength: jest.fn(),
+  getType: jest.fn().mockReturnValue(shipType),
 }));
 
 let gameboard;
 
 beforeEach(() => {
   gameboard = createGameboard();
-});
-
-afterEach(() => {
-  jest.clearAllMocks();
 });
 
 describe('getShip', () => {
@@ -27,7 +26,8 @@ describe('getShip', () => {
   });
 
   it('should return a ship if there is a ship at the location', () => {
-    const ship = createShip(1);
+    const ship = createShip('raft');
+    ship.getLength.mockReturnValue(1);
 
     gameboard.setShip(ship, 1, 1, false);
 
@@ -37,7 +37,8 @@ describe('getShip', () => {
 
 describe('setShip', () => {
   it('should place a ship at the specified location', () => {
-    const ship = createShip(1);
+    const ship = createShip('raft');
+    ship.getLength.mockReturnValue(1);
 
     gameboard.setShip(ship, 1, 1, false);
 
@@ -45,7 +46,8 @@ describe('setShip', () => {
   });
 
   it('should place a ship horizontally at specified location', () => {
-    const ship = createShip(3);
+    const ship = createShip('destroyer');
+    ship.getLength.mockReturnValue(3);
 
     gameboard.setShip(ship, 1, 1, false);
 
@@ -56,7 +58,8 @@ describe('setShip', () => {
   });
 
   it('should place a ship vertically at specified location', () => {
-    const ship = createShip(3);
+    const ship = createShip('destroyer');
+    ship.getLength.mockReturnValue(3);
 
     gameboard.setShip(ship, 1, 1, true);
 
@@ -69,7 +72,8 @@ describe('setShip', () => {
 
 describe('isValidPlacement', () => {
   it('should return false when the ship is partially out of bounds', () => {
-    const ship = createShip(3);
+    const ship = createShip('destroyer');
+    ship.getLength.mockReturnValue(3);
 
     const isValidPlacement = gameboard.isValidPlacement(ship, 9, 9);
 
@@ -77,8 +81,10 @@ describe('isValidPlacement', () => {
   });
 
   it('should return false when ships placement overlaps another ship', () => {
-    const ship1 = createShip(3);
-    const ship2 = createShip(3);
+    const ship1 = createShip('destroyer');
+    const ship2 = createShip('destroyer');
+    ship1.getLength.mockReturnValue(3);
+    ship2.getLength.mockReturnValue(3);
     gameboard.setShip(ship1, 2, 1, false);
 
     const isValidPlacement = gameboard.isValidPlacement(ship2, 1, 2, true);
@@ -110,7 +116,8 @@ describe('infoBoard', () => {
   });
 
   it('should mark an attacked occupied tile as hit', () => {
-    const ship = createShip(3);
+    const ship = createShip('destroyer');
+    ship.getLength.mockReturnValue(3);
     gameboard.setShip(ship, 1, 1, false);
 
     gameboard.receiveAttack(1, 1);
@@ -121,9 +128,22 @@ describe('infoBoard', () => {
 });
 
 describe('isFleetSunk', () => {
+  it('should return true when all ships are sunk', () => {
+    const ship1 = createShip('raft');
+    const ship2 = createShip('raft');
+    gameboard.setShip(ship1, 1, 1, false);
+    gameboard.setShip(ship2, 2, 1, false);
+    ship1.isSunk.mockReturnValue(false);
+    ship2.isSunk.mockReturnValue(true);
+
+    const isFleetSunk = gameboard.isFleetSunk();
+
+    expect(isFleetSunk).toBe(true);
+  });
+
   it('should return false when not all ships are sunk', () => {
-    const ship1 = createShip(1);
-    const ship2 = createShip(1);
+    const ship1 = createShip('raft');
+    const ship2 = createShip('raft');
     gameboard.setShip(ship1, 1, 1, false);
     gameboard.setShip(ship2, 2, 1, false);
     ship1.isSunk.mockReturnValue(true);
@@ -132,5 +152,63 @@ describe('isFleetSunk', () => {
     const isFleetSunk = gameboard.isFleetSunk();
 
     expect(isFleetSunk).toBe(false);
+  });
+});
+
+describe('getInitialPosition', () => {
+  it('should return the initial position data of the ship', () => {
+    const ship1 = createShip('electric boogaloo');
+    const ship2 = createShip('electric boogaloo 2');
+    gameboard.setShip(ship1, 2, 1, true);
+    gameboard.setShip(ship2, 5, 7, false);
+
+    const positionData1 = gameboard.getInitialPosition(ship1.getType());
+    const positionData2 = gameboard.getInitialPosition(ship2.getType());
+
+    const expected1 = {
+      row: 2,
+      col: 1,
+      isVertical: true,
+    };
+    const expected2 = {
+      row: 5,
+      col: 7,
+      isVertical: false,
+    };
+    expect(positionData1).toEqual(expected1);
+    expect(positionData2).toEqual(expected2);
+  });
+
+  it("should return undefined when the ship type hasn't been placed", () => {
+    const positionData = gameboard.getInitialPosition('fake type');
+
+    expect(positionData).toEqual(undefined);
+  });
+});
+
+describe('removeShip', () => {
+  it('should remove the specified ship from the gameboard', () => {
+    const ship1 = createShip('electric boogaloo');
+    const ship2 = createShip('electric boogaloo 2');
+    ship1.getLength.mockReturnValue(2);
+    ship2.getLength.mockReturnValue(3);
+    gameboard.setShip(ship1, 2, 1, true);
+    gameboard.setShip(ship2, 5, 7, false);
+
+    gameboard.removeShip(2, 1);
+
+    expect(gameboard.getShip(2, 1)).toBeNull();
+    expect(gameboard.getShip(3, 1)).toBeNull();
+    expect(gameboard.getInitialPosition('electric boogaloo')).toBeUndefined();
+    expect(gameboard.getShip(5, 7)).not.toBeNull();
+    expect(
+      gameboard.getInitialPosition('electric boogaloo 2'),
+    ).not.toBeUndefined();
+  });
+
+  it('should throw and error when ship being removed is null', () => {
+    expect(() => gameboard.removeShip(2, 1)).toThrow(
+      'Cannot remove ship, no ship exists at location',
+    );
   });
 });

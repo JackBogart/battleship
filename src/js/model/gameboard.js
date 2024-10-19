@@ -7,7 +7,7 @@ export const TileInfo = Object.freeze({
 export function createGameboard() {
   const rows = 10;
   const cols = 10;
-  const ships = [];
+  const shipData = {};
 
   const board = new Array(rows)
     .fill(null)
@@ -51,7 +51,13 @@ export function createGameboard() {
 
       board[currentRow][currentCol] = ship;
     }
-    ships.push(ship);
+
+    shipData[ship.getType()] = {
+      ship,
+      row,
+      col,
+      isVertical,
+    };
   };
 
   const getInfoBoard = () => infoBoard.map((row) => [...row]);
@@ -66,7 +72,40 @@ export function createGameboard() {
     }
   };
 
-  const isFleetSunk = () => ships.every((ship) => ship.isSunk());
+  const isFleetSunk = () =>
+    Object.values(shipData).every((entry) => entry.ship.isSunk());
+
+  // TODO: Should this take the shipType or row, col?
+  const getInitialPosition = (shipType) => {
+    const ship = shipData[shipType];
+    if (ship === undefined) {
+      return undefined;
+    }
+
+    return {
+      row: ship.row,
+      col: ship.col,
+      isVertical: ship.isVertical,
+    };
+  };
+
+  const removeShip = (targetedRow, targetedCol) => {
+    if (board[targetedRow][targetedCol] === null) {
+      throw new Error('Cannot remove ship, no ship exists at location');
+    }
+    const shipType = board[targetedRow][targetedCol].getType();
+    const { ship, row, col, isVertical } = shipData[shipType];
+    const shipLength = ship.getLength();
+
+    for (let i = 0; i < shipLength; i++) {
+      const currentRow = isVertical ? row + i : row;
+      const currentCol = isVertical ? col : col + i;
+
+      board[currentRow][currentCol] = null;
+    }
+
+    delete shipData[shipType];
+  };
 
   return {
     getShip,
@@ -76,5 +115,7 @@ export function createGameboard() {
     receiveAttack,
     isFleetSunk,
     isValidPlacement,
+    getInitialPosition,
+    removeShip,
   };
 }

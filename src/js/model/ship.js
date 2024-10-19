@@ -1,11 +1,29 @@
-export function createShip(length) {
-  if (length <= 0 || length > 5) {
-    throw new Error('Invalid length');
+export const ShipType = Object.freeze({
+  CARRIER: 'carrier',
+  BATTLESHIP: 'battleship',
+  DESTROYER: 'destroyer',
+  SUBMARINE: 'submarine',
+  PATROL_BOAT: 'patrol-boat',
+});
+
+const shipSize = Object.freeze({
+  'carrier': 5,
+  'battleship': 4,
+  'destroyer': 3,
+  'submarine': 3,
+  'patrol-boat': 2,
+});
+
+export function createShip(shipType) {
+  const length = shipSize[shipType];
+  if (!length) {
+    throw new Error('Invalid ship type');
   }
 
   let hits = 0;
 
   const getLength = () => length;
+  const getType = () => shipType;
   const isSunk = () => hits === length;
   const hit = () => {
     if (!isSunk()) {
@@ -13,5 +31,5 @@ export function createShip(length) {
     }
   };
 
-  return { getLength, isSunk, hit };
+  return { getLength, isSunk, hit, getType };
 }

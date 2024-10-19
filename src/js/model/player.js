@@ -9,20 +9,35 @@ export function createPlayer(name, playerType) {
   const gameboard = createGameboard();
 
   const getName = () => name;
+
   const setName = (newName) => {
     name = newName;
   };
+
   const getPlayerType = () => playerType;
+
   const getShip = (row, col) => gameboard.getShip(row, col);
+
   const setShip = (ship, row, col, isVertical = false) => {
     gameboard.setShip(ship, row, col, isVertical);
   };
   const getInfoBoard = () => gameboard.getInfoBoard();
+
   const getTileInfo = (row, col) => gameboard.getTileInfo(row, col);
-  const receiveAttack = (row, col) => gameboard.receiveAttack(row, col);
+
+  const receiveAttack = (row, col) => {
+    gameboard.receiveAttack(row, col);
+  };
+
   const isFleetSunk = () => gameboard.isFleetSunk();
+
   const isValidPlacement = (ship, row, col, isVertical) =>
     gameboard.isValidPlacement(ship, row, col, isVertical);
+
+  const getShipType = (row, col) => {
+    const ship = getShip(row, col);
+    return ship === null ? '' : ship.getType();
+  };
 
   return {
     getName,
@@ -35,5 +50,6 @@ export function createPlayer(name, playerType) {
     receiveAttack,
     isFleetSunk,
     isValidPlacement,
+    getShipType,
   };
 }

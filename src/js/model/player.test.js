@@ -7,11 +7,22 @@ jest.mock('./gameboard', () => ({
 }));
 
 const gameboardInstance = {
+  getShip: jest.fn(),
   setShip: jest.fn(),
   receiveAttack: jest.fn(),
 };
 
+jest.mock('./ship', () => ({
+  createShip: jest.fn(),
+}));
+
 createGameboard.mockImplementation(() => gameboardInstance);
+createShip.mockImplementation((shipType) => ({
+  isSunk: jest.fn(),
+  hit: jest.fn(),
+  getLength: jest.fn(),
+  getType: jest.fn().mockReturnValue(shipType),
+}));
 
 describe('player', () => {
   let player;
@@ -52,7 +63,7 @@ describe('player', () => {
   });
 
   it('should place a ship at the specified location', () => {
-    const ship = createShip(3);
+    const ship = createShip('destroyer');
 
     player.setShip(ship, 1, 2);
 
@@ -63,5 +74,21 @@ describe('player', () => {
     player.receiveAttack(1, 2);
 
     expect(gameboardInstance.receiveAttack).toHaveBeenCalledWith(1, 2);
+  });
+
+  it('should return an empty string when ship is null', () => {
+    gameboardInstance.getShip.mockReturnValueOnce(null);
+
+    const shipType = player.getShipType(1, 2);
+
+    expect(shipType).toBe('');
+  });
+
+  it("should return an string representation of the ship's type", () => {
+    gameboardInstance.getShip.mockReturnValueOnce(createShip('carrier'));
+
+    const shipType = player.getShipType(1, 2);
+
+    expect(shipType).toBe('carrier');
   });
 });
