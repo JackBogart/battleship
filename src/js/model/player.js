@@ -39,6 +39,10 @@ export function createPlayer(name, playerType) {
     return ship === null ? '' : ship.getType();
   };
 
+  const removeAllShips = () => {
+    gameboard.removeAllShips();
+  };
+
   return {
     getName,
     getPlayerType,
@@ -51,5 +55,6 @@ export function createPlayer(name, playerType) {
     isFleetSunk,
     isValidPlacement,
     getShipType,
+    removeAllShips,
   };
 }

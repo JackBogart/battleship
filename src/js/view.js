@@ -24,11 +24,14 @@ export function createView() {
 
     for (let row = 0; row < 10; row++) {
       for (let col = 0; col < 10; col++) {
+        const tile = board.querySelector(
+          `[data-row="${row}"][data-col="${col}"]`,
+        );
+
         if (player.getShip(row, col) !== null) {
-          const tile = board.querySelector(
-            `[data-row="${row}"][data-col="${col}"]`,
-          );
           tile.style.backgroundColor = 'grey';
+        } else {
+          tile.style.backgroundColor = '';
         }
       }
     }
@@ -64,11 +67,19 @@ export function createView() {
     });
   };
 
+  const bindRandomizeShips = (handler) => {
+    const randomizeBtn = document.querySelector('.randomize');
+    randomizeBtn.addEventListener('click', () => {
+      handler();
+    });
+  };
+
   return {
     receiveAttack,
     init,
     renderPlayerShips,
     bindReceiveAttack,
+    bindRandomizeShips,
     reportGameOver,
   };
 }

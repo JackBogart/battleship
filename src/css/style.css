@@ -86,3 +86,12 @@ body {
 .github-banner svg:hover:not(:active) {
   fill: hsl(0, 0%, 50%);
 }
+
+.gameplay-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.randomize {
+  align-self: center;
+}

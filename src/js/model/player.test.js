@@ -10,6 +10,7 @@ const gameboardInstance = {
   getShip: jest.fn(),
   setShip: jest.fn(),
   receiveAttack: jest.fn(),
+  removeAllShips: jest.fn(),
 };
 
 jest.mock('./ship', () => ({
@@ -90,5 +91,11 @@ describe('player', () => {
     const shipType = player.getShipType(1, 2);
 
     expect(shipType).toBe('carrier');
+  });
+
+  it('should remove all ships from the board', () => {
+    player.removeAllShips();
+
+    expect(gameboardInstance.removeAllShips).toHaveBeenCalledWith();
   });
 });

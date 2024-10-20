@@ -7,11 +7,9 @@ export const TileInfo = Object.freeze({
 export function createGameboard() {
   const rows = 10;
   const cols = 10;
-  const shipData = {};
+  let shipData = {};
 
-  const board = new Array(rows)
-    .fill(null)
-    .map(() => new Array(cols).fill(null));
+  let board = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
 
   const infoBoard = new Array(rows)
     .fill(null)
@@ -107,6 +105,11 @@ export function createGameboard() {
     delete shipData[shipType];
   };
 
+  const removeAllShips = () => {
+    board = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
+    shipData = {};
+  };
+
   return {
     getShip,
     setShip,
@@ -117,5 +120,6 @@ export function createGameboard() {
     isValidPlacement,
     getInitialPosition,
     removeShip,
+    removeAllShips,
   };
 }
