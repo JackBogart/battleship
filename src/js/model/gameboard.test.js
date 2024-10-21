@@ -159,11 +159,13 @@ describe('getInitialPosition', () => {
   it('should return the initial position data of the ship', () => {
     const ship1 = createShip('electric boogaloo');
     const ship2 = createShip('electric boogaloo 2');
+    ship1.getLength.mockReturnValue(1);
+    ship2.getLength.mockReturnValue(1);
     gameboard.setShip(ship1, 2, 1, true);
     gameboard.setShip(ship2, 5, 7, false);
 
-    const positionData1 = gameboard.getInitialPosition(ship1.getType());
-    const positionData2 = gameboard.getInitialPosition(ship2.getType());
+    const positionData1 = gameboard.getInitialPosition(2, 1);
+    const positionData2 = gameboard.getInitialPosition(5, 7);
 
     const expected1 = {
       row: 2,
@@ -180,9 +182,9 @@ describe('getInitialPosition', () => {
   });
 
   it("should return undefined when the ship type hasn't been placed", () => {
-    const positionData = gameboard.getInitialPosition('fake type');
+    const positionData = gameboard.getInitialPosition(2, 1);
 
-    expect(positionData).toEqual(undefined);
+    expect(positionData).toBeUndefined();
   });
 });
 
@@ -199,11 +201,9 @@ describe('removeShip', () => {
 
     expect(gameboard.getShip(2, 1)).toBeNull();
     expect(gameboard.getShip(3, 1)).toBeNull();
-    expect(gameboard.getInitialPosition('electric boogaloo')).toBeUndefined();
+    expect(gameboard.getInitialPosition(2, 1)).toBeUndefined();
     expect(gameboard.getShip(5, 7)).not.toBeNull();
-    expect(
-      gameboard.getInitialPosition('electric boogaloo 2'),
-    ).not.toBeUndefined();
+    expect(gameboard.getInitialPosition(5, 7)).not.toBeUndefined();
   });
 
   it('should throw and error when ship being removed is null', () => {
@@ -226,10 +226,10 @@ describe('removeAllShips', () => {
 
     expect(gameboard.getShip(2, 1)).toBeNull();
     expect(gameboard.getShip(3, 1)).toBeNull();
-    expect(gameboard.getInitialPosition('electric boogaloo')).toBeUndefined();
+    expect(gameboard.getInitialPosition(3, 1)).toBeUndefined();
     expect(gameboard.getShip(5, 7)).toBeNull();
     expect(gameboard.getShip(5, 8)).toBeNull();
     expect(gameboard.getShip(5, 9)).toBeNull();
-    expect(gameboard.getInitialPosition('electric boogaloo 2')).toBeUndefined();
+    expect(gameboard.getInitialPosition(5, 8)).toBeUndefined();
   });
 });

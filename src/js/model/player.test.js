@@ -11,6 +11,7 @@ const gameboardInstance = {
   setShip: jest.fn(),
   receiveAttack: jest.fn(),
   removeAllShips: jest.fn(),
+  getInitialPosition: jest.fn(),
 };
 
 jest.mock('./ship', () => ({

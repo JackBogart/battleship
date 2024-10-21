@@ -66,6 +66,20 @@ export function createController() {
       player2.receiveAttack(row, col);
       view.receiveAttack(row, col, player2.getTileInfo(row, col), false);
 
+      if (
+        player2.getTileInfo(row, col) === TileInfo.HIT &&
+        player2.getShip(row, col).isSunk()
+      ) {
+        const positionData = player2.getInitialPosition(row, col);
+        view.renderShip(
+          false,
+          positionData.row,
+          positionData.col,
+          positionData.isVertical,
+          player2.getShip(row, col).getLength(),
+        );
+      }
+
       if (player2.isFleetSunk()) {
         view.reportGameOver(player1.getName());
         isGameOver = true;
@@ -96,7 +110,7 @@ export function createController() {
     player1.removeAllShips();
     player2.removeAllShips();
     tempInitBoards(player1, player2);
-    view.renderPlayerShips(true, player1);
+    view.renderAllPlayerShips(true, player1);
   };
 
   const run = () => {
@@ -104,7 +118,7 @@ export function createController() {
     view.bindReceiveAttack(handleReceiveAttack);
     view.bindRandomizeShips(handleRandomizeShips);
     tempInitBoards(player1, player2);
-    view.renderPlayerShips(true, player1);
+    view.renderAllPlayerShips(true, player1);
   };
 
   return { run };

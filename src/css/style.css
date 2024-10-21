@@ -12,7 +12,25 @@
     'Helvetica Neue',
     sans-serif;
   color: white;
-  --header-background-color: hsl(229, 78%, 34%);
+  --primary-hue: 229;
+  --primary-saturation: 78%;
+  --primary-luminance: 34%;
+
+  --primary-background-color: hsl(
+    var(--primary-hue),
+    var(--primary-saturation),
+    var(--primary-luminance)
+  );
+  --primary-background-color-light: hsl(
+    var(--primary-hue),
+    var(--primary-saturation),
+    calc(var(--primary-luminance) + 5%)
+  );
+  --primary-background-color-lightest: hsl(
+    var(--primary-hue),
+    var(--primary-saturation),
+    calc(var(--primary-luminance) + 10%)
+  );
   --grid-cell-size: 2.5rem;
 }
 
@@ -23,7 +41,7 @@ body {
 }
 
 .header {
-  background-color: var(--header-background-color);
+  background-color: var(--primary-background-color);
   font-weight: 500;
   display: flex;
   font-size: 1.5rem;
@@ -94,4 +112,21 @@ body {
 
 .randomize {
   align-self: center;
+}
+
+.btn {
+  appearance: none;
+  border: none;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  background: var(--primary-background-color);
+  color: white;
+}
+
+.btn:hover {
+  background: var(--primary-background-color-light);
+}
+
+.btn:active {
+  background: var(--primary-background-color-lightest);
 }

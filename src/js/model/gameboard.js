@@ -74,12 +74,12 @@ export function createGameboard() {
     Object.values(shipData).every((entry) => entry.ship.isSunk());
 
   // TODO: Should this take the shipType or row, col?
-  const getInitialPosition = (shipType) => {
-    const ship = shipData[shipType];
-    if (ship === undefined) {
+  const getInitialPosition = (row, col) => {
+    if (board[row][col] === null) {
       return undefined;
     }
 
+    const ship = shipData[board[row][col].getType()];
     return {
       row: ship.row,
       col: ship.col,
@@ -91,6 +91,7 @@ export function createGameboard() {
     if (board[targetedRow][targetedCol] === null) {
       throw new Error('Cannot remove ship, no ship exists at location');
     }
+
     const shipType = board[targetedRow][targetedCol].getType();
     const { ship, row, col, isVertical } = shipData[shipType];
     const shipLength = ship.getLength();

@@ -19,7 +19,7 @@ export function createView() {
     });
   };
 
-  const renderPlayerShips = (isPlayer1, player) => {
+  const renderAllPlayerShips = (isPlayer1, player) => {
     const board = isPlayer1 ? player1Board : player2Board;
 
     for (let row = 0; row < 10; row++) {
@@ -34,6 +34,20 @@ export function createView() {
           tile.style.backgroundColor = '';
         }
       }
+    }
+  };
+
+  const renderShip = (isPlayer1, row, col, isVertical, shipLength) => {
+    const board = isPlayer1 ? player1Board : player2Board;
+
+    for (let i = 0; i < shipLength; i++) {
+      const currentRow = isVertical ? row + i : row;
+      const currentCol = isVertical ? col : col + i;
+
+      const tile = board.querySelector(
+        `[data-row="${currentRow}"][data-col="${currentCol}"]`,
+      );
+      tile.style.backgroundColor = 'grey';
     }
   };
 
@@ -77,9 +91,10 @@ export function createView() {
   return {
     receiveAttack,
     init,
-    renderPlayerShips,
+    renderAllPlayerShips,
     bindReceiveAttack,
     bindRandomizeShips,
     reportGameOver,
+    renderShip,
   };
 }

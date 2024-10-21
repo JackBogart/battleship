@@ -43,6 +43,9 @@ export function createPlayer(name, playerType) {
     gameboard.removeAllShips();
   };
 
+  const getInitialPosition = (row, col) =>
+    gameboard.getInitialPosition(row, col);
+
   return {
     getName,
     getPlayerType,
@@ -56,5 +59,6 @@ export function createPlayer(name, playerType) {
     isValidPlacement,
     getShipType,
     removeAllShips,
+    getInitialPosition,
   };
 }
