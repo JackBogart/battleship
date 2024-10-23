@@ -1,8 +1,20 @@
 import { TileInfo } from './model/gameboard';
+
+function createButton(className, text) {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.classList.add('btn', className);
+  button.textContent = text;
+
+  return button;
+}
+
 export function createView() {
   const player1Board = document.querySelector('.player-1');
   const player2Board = document.querySelector('.player-2');
+  const status = document.querySelector('.current-status');
   const gameboards = document.querySelectorAll('.gameboard');
+  const buttons = document.querySelector('.buttons');
 
   const init = () => {
     gameboards.forEach((grid) => {
@@ -60,10 +72,39 @@ export function createView() {
     tile.classList.add(tileInfo === TileInfo.HIT ? 'hit-cell' : 'miss-cell');
   };
 
-  const reportGameOver = (name) => [
-    // TODO: Replace this alert with custom non-modal/modal
-    alert(`${name} wins! Refresh for a new game.`),
-  ];
+  const resetBoards = () => {
+    status.textContent = ``;
+    const playerBoards = [player1Board, player2Board];
+
+    for (let row = 0; row < 10; row++) {
+      for (let col = 0; col < 10; col++) {
+        playerBoards.forEach((board) => {
+          const tile = board.querySelector(
+            `[data-row="${row}"][data-col="${col}"]`,
+          );
+          tile.style.backgroundColor = '';
+          tile.classList = 'grid-cell';
+        });
+      }
+    }
+  };
+
+  const reportGameOver = (name) => {
+    status.textContent = `${name} wins!`;
+
+    const playAgainBtn = createButton('play-again', 'Play Again');
+    buttons.appendChild(playAgainBtn);
+  };
+
+  const addPreGameControls = () => {
+    const startGameBtn = createButton('start-game', 'Start Game');
+    const randomizeBtn = createButton('randomize', 'Reroll Ships');
+    buttons.replaceChildren(startGameBtn, randomizeBtn);
+  };
+
+  const removePreGameControls = () => {
+    buttons.replaceChildren();
+  };
 
   const bindReceiveAttack = (handler) => {
     gameboards.forEach((gameboard) => {
@@ -81,10 +122,15 @@ export function createView() {
     });
   };
 
-  const bindRandomizeShips = (handler) => {
-    const randomizeBtn = document.querySelector('.randomize');
-    randomizeBtn.addEventListener('click', () => {
-      handler();
+  const bindButtons = (handlers) => {
+    buttons.addEventListener('click', (event) => {
+      if (event.target.classList.contains('randomize')) {
+        handlers.randomize();
+      } else if (event.target.classList.contains('start-game')) {
+        handlers.start();
+      } else if (event.target.classList.contains('play-again')) {
+        handlers.playAgain();
+      }
     });
   };
 
@@ -93,8 +139,11 @@ export function createView() {
     init,
     renderAllPlayerShips,
     bindReceiveAttack,
-    bindRandomizeShips,
+    bindButtons,
     reportGameOver,
     renderShip,
+    removePreGameControls,
+    addPreGameControls,
+    resetBoards,
   };
 }

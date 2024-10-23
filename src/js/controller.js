@@ -38,10 +38,9 @@ function getRandomInt(max) {
 
 export function createController() {
   const view = createView();
-  const player1 = createPlayer('Jack', PlayerType.HUMAN);
-  const player2 = createPlayer('Computer', PlayerType.COMPUTER);
-  let isGameOver = false;
-  let isGameStarted = false;
+  let player1 = createPlayer('Jack', PlayerType.HUMAN);
+  let player2 = createPlayer('Computer', PlayerType.COMPUTER);
+  let isGameInProgress = false;
 
   const getComputerAttack = () => {
     let row = getRandomInt(10);
@@ -56,10 +55,9 @@ export function createController() {
   };
 
   const handleReceiveAttack = (row, col, isPlayer1) => {
-    if (isPlayer1 || isGameOver) {
+    if (isPlayer1 || !isGameInProgress) {
       return;
     }
-    isGameStarted = true;
 
     //Extract below to separate function for readability?
     if (player2.getTileInfo(row, col) === TileInfo.UNKNOWN) {
@@ -82,7 +80,7 @@ export function createController() {
 
       if (player2.isFleetSunk()) {
         view.reportGameOver(player1.getName());
-        isGameOver = true;
+        isGameInProgress = false;
       } else {
         const [computerRow, computerCol] = getComputerAttack();
         player1.receiveAttack(computerRow, computerCol);
@@ -95,7 +93,8 @@ export function createController() {
 
         if (player1.isFleetSunk()) {
           view.reportGameOver(player2.getName());
-          isGameOver = true;
+          view.renderAllPlayerShips(false, player2);
+          isGameInProgress = false;
         }
       }
     }
@@ -103,20 +102,34 @@ export function createController() {
   };
 
   const handleRandomizeShips = () => {
-    if (isGameStarted) {
-      return;
-    }
-
     player1.removeAllShips();
     player2.removeAllShips();
     tempInitBoards(player1, player2);
     view.renderAllPlayerShips(true, player1);
   };
 
+  const handleStartGame = () => {
+    isGameInProgress = true;
+    view.removePreGameControls();
+  };
+
+  const handlePlayAgain = () => {
+    view.resetBoards();
+    player1 = createPlayer('Jack', PlayerType.HUMAN);
+    player2 = createPlayer('Computer', PlayerType.COMPUTER);
+    tempInitBoards(player1, player2);
+    view.renderAllPlayerShips(true, player1);
+    view.addPreGameControls();
+  };
+
   const run = () => {
     view.init();
     view.bindReceiveAttack(handleReceiveAttack);
-    view.bindRandomizeShips(handleRandomizeShips);
+    view.bindButtons({
+      randomize: handleRandomizeShips,
+      start: handleStartGame,
+      playAgain: handlePlayAgain,
+    });
     tempInitBoards(player1, player2);
     view.renderAllPlayerShips(true, player1);
   };
