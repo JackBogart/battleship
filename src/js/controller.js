@@ -38,7 +38,7 @@ function getRandomInt(max) {
 
 export function createController() {
   const view = createView();
-  let player1 = createPlayer('Jack', PlayerType.HUMAN);
+  let player1 = createPlayer('Player', PlayerType.HUMAN);
   let player2 = createPlayer('Computer', PlayerType.COMPUTER);
   let isGameInProgress = false;
 
@@ -115,7 +115,7 @@ export function createController() {
 
   const handlePlayAgain = () => {
     view.resetBoards();
-    player1 = createPlayer('Jack', PlayerType.HUMAN);
+    player1 = createPlayer('Player', PlayerType.HUMAN);
     player2 = createPlayer('Computer', PlayerType.COMPUTER);
     tempInitBoards(player1, player2);
     view.renderAllPlayerShips(true, player1);
