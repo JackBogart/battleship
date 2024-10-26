@@ -51,7 +51,7 @@ describe('player', () => {
   });
 
   it("should return a human players's type", () => {
-    const playerType = player.getPlayerType();
+    const playerType = player.getType();
 
     expect(playerType).toBe(PlayerType.HUMAN);
   });
@@ -59,7 +59,7 @@ describe('player', () => {
   it("should return a computer players's type", () => {
     player = createPlayer('Computer', PlayerType.COMPUTER);
 
-    const playerType = player.getPlayerType();
+    const playerType = player.getType();
 
     expect(playerType).toBe(PlayerType.COMPUTER);
   });

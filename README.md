@@ -2,7 +2,6 @@
 
 ### Todo
 
-- Add messages about type of ship sunk
 - Add ability to set name
 - Implement drag and drop system
 - Polish the intelligence of computer moves
@@ -12,3 +11,6 @@
 - Add dark mode
 - Options menu to change site theme color?
   - This isn't required at all but would be kinda cool
+- Add messages about type of ship sunk
+  - Not sure how to do this in a way that looks good. Currently I've moved this
+    to the bottom but the idea might be dropped. Need to brainstorm.

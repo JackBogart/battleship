@@ -14,7 +14,7 @@ export function createPlayer(name, playerType) {
     name = newName;
   };
 
-  const getPlayerType = () => playerType;
+  const getType = () => playerType;
 
   const getShip = (row, col) => gameboard.getShip(row, col);
 
@@ -48,7 +48,7 @@ export function createPlayer(name, playerType) {
 
   return {
     getName,
-    getPlayerType,
+    getType,
     setName,
     getShip,
     setShip,

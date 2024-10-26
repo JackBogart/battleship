@@ -49,7 +49,14 @@ export function createView() {
     }
   };
 
-  const renderShip = (isPlayer1, row, col, isVertical, shipLength) => {
+  const renderShip = (
+    isPlayer1,
+    row,
+    col,
+    isVertical,
+    shipLength,
+    isComputerAttacking,
+  ) => {
     const board = isPlayer1 ? player1Board : player2Board;
 
     for (let i = 0; i < shipLength; i++) {
@@ -59,13 +66,12 @@ export function createView() {
       const tile = board.querySelector(
         `[data-row="${currentRow}"][data-col="${currentCol}"]`,
       );
-      tile.style.backgroundColor = 'grey';
+      tile.style.backgroundColor = isComputerAttacking ? 'red' : 'grey';
     }
   };
 
-  const receiveAttack = (row, col, tileInfo, isComputer) => {
-    // Get the board being attacked by the current player, not their own board
-    const attackedBoard = isComputer ? player1Board : player2Board;
+  const receiveAttack = (row, col, tileInfo, isPlayer1Turn) => {
+    const attackedBoard = isPlayer1Turn ? player2Board : player1Board;
     const tile = attackedBoard.querySelector(
       `[data-row="${row}"][data-col="${col}"]`,
     );
@@ -106,6 +112,7 @@ export function createView() {
     buttons.replaceChildren();
   };
 
+  // Binders below
   const bindReceiveAttack = (handler) => {
     gameboards.forEach((gameboard) => {
       gameboard.addEventListener('click', (event) => {

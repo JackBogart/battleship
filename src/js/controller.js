@@ -41,6 +41,7 @@ export function createController() {
   let player1 = createPlayer('Player', PlayerType.HUMAN);
   let player2 = createPlayer('Computer', PlayerType.COMPUTER);
   let isGameInProgress = false;
+  let isPlayer1Turn = true;
 
   const getComputerAttack = () => {
     let row = getRandomInt(10);
@@ -54,51 +55,79 @@ export function createController() {
     return [row, col];
   };
 
-  const handleReceiveAttack = (row, col, isPlayer1) => {
-    if (isPlayer1 || !isGameInProgress) {
+  /**
+   * Handles the logic of a player attacking during their turn. This includes
+   * updating the models and updating the view. Additionally if a ship is sunk
+   * or the game is over, it'll report that on the view and update internal
+   * logic to prevent further moves.
+   *
+   * @param {Object} attackedPlayer - The player being attacked
+   * @param {number} row - The row being attacked
+   * @param {number} col - The column being attacked
+   */
+  const playerTurn = (attackedPlayer, row, col) => {
+    const attackingPlayer = isPlayer1Turn ? player1 : player2;
+    attackedPlayer.receiveAttack(row, col);
+
+    const attackedTile = attackedPlayer.getTileInfo(row, col);
+    view.receiveAttack(row, col, attackedTile, isPlayer1Turn);
+
+    if (
+      attackedTile === TileInfo.HIT &&
+      attackedPlayer.getShip(row, col).isSunk()
+    ) {
+      const positionData = attackedPlayer.getInitialPosition(row, col);
+      const ship = attackedPlayer.getShip(row, col);
+      const isComputerAttacking =
+        attackingPlayer.getType() === PlayerType.COMPUTER;
+      view.renderShip(
+        !isPlayer1Turn,
+        positionData.row,
+        positionData.col,
+        positionData.isVertical,
+        ship.getLength(),
+        isComputerAttacking,
+      );
+    }
+
+    if (attackedPlayer.isFleetSunk()) {
+      view.reportGameOver(attackingPlayer.getName());
+      view.renderAllPlayerShips(isPlayer1Turn, attackingPlayer);
+      isGameInProgress = false;
+    }
+
+    isPlayer1Turn = !isPlayer1Turn;
+  };
+
+  /**
+   * Handler function for a board being attacked. It will take the coordinates
+   * of the tile being attacked, along with a boolean that represents if it's
+   * player 1 being attacked.
+   *
+   * @param {number} row - The row being attacked
+   * @param {number} col - The column being attacked
+   * @param {boolean} isPlayer1Attacked - true if player 1 is being attacked
+   */
+  const handleReceiveAttack = (row, col, isPlayer1Attacked) => {
+    const isPlayer2Computer = player2.getType() === PlayerType.COMPUTER;
+    console.log(isPlayer1Attacked);
+    if (
+      (isPlayer1Attacked && isPlayer2Computer) ||
+      isPlayer1Attacked === isPlayer1Turn ||
+      !isGameInProgress
+    ) {
       return;
     }
+    const attackedPlayer = isPlayer1Attacked ? player1 : player2;
 
-    //Extract below to separate function for readability?
-    if (player2.getTileInfo(row, col) === TileInfo.UNKNOWN) {
-      player2.receiveAttack(row, col);
-      view.receiveAttack(row, col, player2.getTileInfo(row, col), false);
+    if (attackedPlayer.getTileInfo(row, col) === TileInfo.UNKNOWN) {
+      playerTurn(attackedPlayer, row, col);
 
-      if (
-        player2.getTileInfo(row, col) === TileInfo.HIT &&
-        player2.getShip(row, col).isSunk()
-      ) {
-        const positionData = player2.getInitialPosition(row, col);
-        view.renderShip(
-          false,
-          positionData.row,
-          positionData.col,
-          positionData.isVertical,
-          player2.getShip(row, col).getLength(),
-        );
-      }
-
-      if (player2.isFleetSunk()) {
-        view.reportGameOver(player1.getName());
-        isGameInProgress = false;
-      } else {
+      if (isGameInProgress && isPlayer2Computer) {
         const [computerRow, computerCol] = getComputerAttack();
-        player1.receiveAttack(computerRow, computerCol);
-        view.receiveAttack(
-          computerRow,
-          computerCol,
-          player1.getTileInfo(computerRow, computerCol),
-          true,
-        );
-
-        if (player1.isFleetSunk()) {
-          view.reportGameOver(player2.getName());
-          view.renderAllPlayerShips(false, player2);
-          isGameInProgress = false;
-        }
+        playerTurn(player1, computerRow, computerCol);
       }
     }
-    // TODO: Create a non-modal popup if attacking revealed tile
   };
 
   const handleRandomizeShips = () => {
@@ -117,6 +146,8 @@ export function createController() {
     view.resetBoards();
     player1 = createPlayer('Player', PlayerType.HUMAN);
     player2 = createPlayer('Computer', PlayerType.COMPUTER);
+    isGameInProgress = false;
+    isPlayer1Turn = true;
     tempInitBoards(player1, player2);
     view.renderAllPlayerShips(true, player1);
     view.addPreGameControls();

@@ -73,7 +73,6 @@ export function createGameboard() {
   const isFleetSunk = () =>
     Object.values(shipData).every((entry) => entry.ship.isSunk());
 
-  // TODO: Should this take the shipType or row, col?
   const getInitialPosition = (row, col) => {
     if (board[row][col] === null) {
       return undefined;
