@@ -49,14 +49,27 @@ export function createView() {
     }
   };
 
-  const renderShip = (
-    isPlayer1,
-    row,
-    col,
-    isVertical,
-    shipLength,
-    isComputerAttacking,
-  ) => {
+  // TODO: This will need to be updated when two player is supported
+  const renderAllSunkenShips = (isPlayer1, player) => {
+    const board = isPlayer1 ? player1Board : player2Board;
+
+    for (let row = 0; row < 10; row++) {
+      for (let col = 0; col < 10; col++) {
+        const tile = board.querySelector(
+          `[data-row="${row}"][data-col="${col}"]`,
+        );
+
+        if (
+          player.getTileInfo(row, col) === TileInfo.HIT &&
+          player.getShip(row, col).isSunk()
+        ) {
+          tile.style.backgroundColor = 'red';
+        }
+      }
+    }
+  };
+
+  const renderSunkenShip = (isPlayer1, row, col, isVertical, shipLength) => {
     const board = isPlayer1 ? player1Board : player2Board;
 
     for (let i = 0; i < shipLength; i++) {
@@ -66,7 +79,7 @@ export function createView() {
       const tile = board.querySelector(
         `[data-row="${currentRow}"][data-col="${currentCol}"]`,
       );
-      tile.style.backgroundColor = isComputerAttacking ? 'red' : 'grey';
+      tile.style.backgroundColor = 'red';
     }
   };
 
@@ -148,9 +161,10 @@ export function createView() {
     bindReceiveAttack,
     bindButtons,
     reportGameOver,
-    renderShip,
+    renderSunkenShip,
     removePreGameControls,
     addPreGameControls,
     resetBoards,
+    renderAllSunkenShips,
   };
 }

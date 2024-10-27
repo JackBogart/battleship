@@ -63,21 +63,19 @@ export function createController() {
     ) {
       const positionData = attackedPlayer.getInitialPosition(row, col);
       const ship = attackedPlayer.getShip(row, col);
-      const isComputerAttacking =
-        attackingPlayer.getType() === PlayerType.COMPUTER;
-      view.renderShip(
+
+      view.renderSunkenShip(
         !isPlayer1Turn,
         positionData.row,
         positionData.col,
         positionData.isVertical,
         ship.getLength(),
-        isComputerAttacking,
       );
     }
 
     if (attackedPlayer.isFleetSunk()) {
       view.reportGameOver(attackingPlayer.getName());
-      view.renderAllPlayerShips(isPlayer1Turn, attackingPlayer);
+      view.renderAllSunkenShips(isPlayer1Turn, attackingPlayer);
       isGameInProgress = false;
     }
 
@@ -132,7 +130,7 @@ export function createController() {
   const handlePlayAgain = () => {
     view.resetBoards();
     player1 = createPlayer('Player', PlayerType.HUMAN);
-    player2 = createPlayer('Computer', PlayerType.COMPUTER);
+    player2 = createComputerPlayer();
     isGameInProgress = false;
     isPlayer1Turn = true;
     tempInitBoards(player1, player2);

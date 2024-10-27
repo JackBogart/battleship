@@ -2,9 +2,11 @@
 
 ### Todo
 
+- Fix colors for renderAllShips when game is over
 - Add ability to set name
 - Implement drag and drop system
 - Implement two player mode
+  - Adjust rendering to account for two player mode
 - Redesign the page layout. Currently it uses a very generic layout that I made
   on a whim.
 - Add dark mode
