@@ -1,3 +1,5 @@
+import { NUM_OF_COLUMNS, NUM_OF_ROWS } from '../constants';
+
 export const TileInfo = Object.freeze({
   UNKNOWN: Symbol('unknown'),
   MISSED: Symbol('missed'),
@@ -5,25 +7,25 @@ export const TileInfo = Object.freeze({
 });
 
 export function createGameboard() {
-  const rows = 10;
-  const cols = 10;
   let shipData = {};
 
-  let board = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
-
-  const infoBoard = new Array(rows)
+  let board = new Array(NUM_OF_ROWS)
     .fill(null)
-    .map(() => new Array(cols).fill(TileInfo.UNKNOWN));
+    .map(() => new Array(NUM_OF_COLUMNS).fill(null));
+
+  const infoBoard = new Array(NUM_OF_ROWS)
+    .fill(null)
+    .map(() => new Array(NUM_OF_COLUMNS).fill(TileInfo.UNKNOWN));
 
   const getShip = (row, col) => board[row][col];
 
   const isValidPlacement = (ship, row, col, isVertical) => {
     const shipLength = ship.getLength();
     if (isVertical) {
-      if (row + shipLength > rows) {
+      if (row + shipLength > NUM_OF_ROWS) {
         return false;
       }
-    } else if (col + shipLength > cols) {
+    } else if (col + shipLength > NUM_OF_COLUMNS) {
       return false;
     }
 
@@ -106,7 +108,9 @@ export function createGameboard() {
   };
 
   const removeAllShips = () => {
-    board = new Array(rows).fill(null).map(() => new Array(cols).fill(null));
+    board = new Array(NUM_OF_ROWS)
+      .fill(null)
+      .map(() => new Array(NUM_OF_COLUMNS).fill(null));
     shipData = {};
   };
 

@@ -1,6 +1,7 @@
 import { TileInfo } from './model/gameboard';
-import { PlayerType, createPlayer } from './model/player';
+import { PlayerType, createComputerPlayer, createPlayer } from './model/player';
 import { ShipType, createShip } from './model/ship';
+import { getRandomInt } from './utils';
 import { createView } from './view';
 
 function placeShipRandomly(player, ship) {
@@ -32,28 +33,12 @@ function tempInitBoards(player1, player2) {
   placeShipRandomly(player2, createShip(ShipType.PATROL_BOAT));
 }
 
-function getRandomInt(max) {
-  return Math.floor(Math.random() * max);
-}
-
 export function createController() {
   const view = createView();
   let player1 = createPlayer('Player', PlayerType.HUMAN);
-  let player2 = createPlayer('Computer', PlayerType.COMPUTER);
+  let player2 = createComputerPlayer();
   let isGameInProgress = false;
   let isPlayer1Turn = true;
-
-  const getComputerAttack = () => {
-    let row = getRandomInt(10);
-    let col = getRandomInt(10);
-
-    while (player1.getTileInfo(row, col) !== TileInfo.UNKNOWN) {
-      row = getRandomInt(10);
-      col = getRandomInt(10);
-    }
-
-    return [row, col];
-  };
 
   /**
    * Handles the logic of a player attacking during their turn. This includes
@@ -110,7 +95,6 @@ export function createController() {
    */
   const handleReceiveAttack = (row, col, isPlayer1Attacked) => {
     const isPlayer2Computer = player2.getType() === PlayerType.COMPUTER;
-    console.log(isPlayer1Attacked);
     if (
       (isPlayer1Attacked && isPlayer2Computer) ||
       isPlayer1Attacked === isPlayer1Turn ||
@@ -124,7 +108,10 @@ export function createController() {
       playerTurn(attackedPlayer, row, col);
 
       if (isGameInProgress && isPlayer2Computer) {
-        const [computerRow, computerCol] = getComputerAttack();
+        const [computerRow, computerCol] = player2.getComputerAttack(
+          player1.getInfoBoard(),
+        );
+        player2.updateLastAttack(computerRow, computerCol);
         playerTurn(player1, computerRow, computerCol);
       }
     }

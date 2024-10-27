@@ -1,10 +1,19 @@
-import { createGameboard } from './gameboard';
-import { PlayerType, createPlayer } from './player';
+import { TileInfo, createGameboard } from './gameboard';
+import { PlayerType, createComputerPlayer, createPlayer } from './player';
 import { createShip } from './ship';
+import { getRandomInt } from '../utils';
 
-jest.mock('./gameboard', () => ({
-  createGameboard: jest.fn(),
-}));
+jest.mock('./gameboard', () => {
+  const originalModule = jest.requireActual('./gameboard');
+
+  return {
+    __esModule: true,
+    ...originalModule,
+    createGameboard: jest.fn(),
+  };
+});
+jest.mock('../utils');
+jest.mock('./ship');
 
 const gameboardInstance = {
   getShip: jest.fn(),
@@ -12,11 +21,8 @@ const gameboardInstance = {
   receiveAttack: jest.fn(),
   removeAllShips: jest.fn(),
   getInitialPosition: jest.fn(),
+  getTileInfo: jest.fn(),
 };
-
-jest.mock('./ship', () => ({
-  createShip: jest.fn(),
-}));
 
 createGameboard.mockImplementation(() => gameboardInstance);
 createShip.mockImplementation((shipType) => ({
@@ -26,9 +32,9 @@ createShip.mockImplementation((shipType) => ({
   getType: jest.fn().mockReturnValue(shipType),
 }));
 
-describe('player', () => {
-  let player;
+let player;
 
+describe('player', () => {
   beforeEach(() => {
     player = createPlayer('Billy', PlayerType.HUMAN);
   });
@@ -54,14 +60,6 @@ describe('player', () => {
     const playerType = player.getType();
 
     expect(playerType).toBe(PlayerType.HUMAN);
-  });
-
-  it("should return a computer players's type", () => {
-    player = createPlayer('Computer', PlayerType.COMPUTER);
-
-    const playerType = player.getType();
-
-    expect(playerType).toBe(PlayerType.COMPUTER);
   });
 
   it('should place a ship at the specified location', () => {
@@ -98,5 +96,67 @@ describe('player', () => {
     player.removeAllShips();
 
     expect(gameboardInstance.removeAllShips).toHaveBeenCalledWith();
+  });
+});
+
+describe('computer player', () => {
+  beforeEach(() => {
+    player = createComputerPlayer();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("should return a computer players's type", () => {
+    const playerType = player.getType();
+
+    expect(playerType).toBe(PlayerType.COMPUTER);
+  });
+
+  it('should return a valid attack location', () => {
+    const infoBoard = new Array(10)
+      .fill(null)
+      .map(() => new Array(10).fill(TileInfo.UNKNOWN));
+    getRandomInt.mockReturnValueOnce(3).mockReturnValueOnce(5);
+
+    const [row, col] = player.getComputerAttack(infoBoard);
+
+    expect(row).toBe(3);
+    expect(col).toBe(5);
+  });
+
+  it('should retry when a random location is already attacked', () => {
+    const infoBoard = new Array(10)
+      .fill(null)
+      .map(() => new Array(10).fill(TileInfo.UNKNOWN));
+    infoBoard[3][5] = TileInfo.HIT;
+    getRandomInt
+      .mockReturnValueOnce(3)
+      .mockReturnValueOnce(5)
+      .mockReturnValueOnce(2)
+      .mockReturnValueOnce(7);
+
+    const [row, col] = player.getComputerAttack(infoBoard);
+
+    expect(getRandomInt).toHaveBeenCalledTimes(4);
+    expect(row).toBe(2);
+    expect(col).toBe(7);
+  });
+
+  it('should attack an adjacent tile when the last attack was a hit', () => {
+    const infoBoard = new Array(10)
+      .fill(null)
+      .map(() => new Array(10).fill(TileInfo.UNKNOWN));
+    infoBoard[3][5] = TileInfo.HIT;
+    infoBoard[2][5] = TileInfo.HIT;
+    player.updateLastAttack(3, 5);
+    getRandomInt.mockReturnValueOnce(2).mockReturnValueOnce(1);
+
+    const [row, col] = player.getComputerAttack(infoBoard);
+
+    expect(getRandomInt).toHaveBeenCalledTimes(2);
+    expect(row).toBe(4);
+    expect(col).toBe(5);
   });
 });
