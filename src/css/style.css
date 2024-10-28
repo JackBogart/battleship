@@ -71,8 +71,17 @@ body {
   grid-template-columns: repeat(10, var(--grid-cell-size));
 }
 
-.gameboard > * {
-  border: 0.1rem solid black;
+.grid-cell {
+  border-right: 0.1rem solid black;
+  border-bottom: 0.1rem solid black;
+}
+
+.grid-top-cell {
+  border-top: 0.1rem solid black;
+}
+
+.grid-left-cell {
+  border-left: 0.1rem solid black;
 }
 
 .current-status {

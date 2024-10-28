@@ -25,6 +25,13 @@ export function createView() {
           gridCell.dataset.col = col;
           gridCell.classList.add('grid-cell');
 
+          if (row === 0) {
+            gridCell.classList.add('grid-top-cell');
+          }
+          if (col === 0) {
+            gridCell.classList.add('grid-left-cell');
+          }
+
           grid.appendChild(gridCell);
         }
       }
