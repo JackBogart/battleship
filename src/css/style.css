@@ -32,6 +32,9 @@
     calc(var(--primary-luminance) + 10%)
   );
   --grid-cell-size: 2.5rem;
+  --grid-border-size: 0.125rem;
+  --grid-border-color: hsl(0, 0%, 12%);
+  --grid-cell-color: hsl(0, 0%, 100%);
 }
 
 body {
@@ -69,19 +72,9 @@ body {
   display: grid;
   grid-template-rows: repeat(10, var(--grid-cell-size));
   grid-template-columns: repeat(10, var(--grid-cell-size));
-}
-
-.grid-cell {
-  border-right: 0.1rem solid black;
-  border-bottom: 0.1rem solid black;
-}
-
-.grid-top-cell {
-  border-top: 0.1rem solid black;
-}
-
-.grid-left-cell {
-  border-left: 0.1rem solid black;
+  gap: var(--grid-border-size);
+  background-color: var(--grid-border-color);
+  border: var(--grid-border-color) var(--grid-border-size) solid;
 }
 
 .current-status {
@@ -91,12 +84,18 @@ body {
   align-items: center;
 }
 
+.grid-cell {
+  background-color: var(--grid-cell-color);
+}
+
 .hit-cell {
-  background: url('../img/hit-marker.svg') center center no-repeat;
+  background: var(--grid-cell-color) url('../img/hit-marker.svg') center center
+    no-repeat;
 }
 
 .miss-cell {
-  background: url('../img/miss-marker.svg') center center no-repeat;
+  background: var(--grid-cell-color) url('../img/miss-marker.svg') center center
+    no-repeat;
 }
 
 .github-banner {

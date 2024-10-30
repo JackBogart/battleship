@@ -75,6 +75,7 @@ export function createController() {
 
     if (attackedPlayer.isFleetSunk()) {
       view.reportGameOver(attackingPlayer.getName());
+      view.renderAllPlayerShips(isPlayer1Turn, attackingPlayer);
       view.renderAllSunkenShips(isPlayer1Turn, attackingPlayer);
       isGameInProgress = false;
     }
