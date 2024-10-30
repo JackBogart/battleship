@@ -1,7 +1,7 @@
 import { TileInfo, createGameboard } from './gameboard';
 import { PlayerType, createComputerPlayer, createPlayer } from './player';
 import { createShip } from './ship';
-import { getRandomInt } from '../utils';
+import { getRandomInt, shuffleArray } from '../utils';
 
 jest.mock('./gameboard', () => {
   const originalModule = jest.requireActual('./gameboard');
@@ -149,13 +149,16 @@ describe('computer player', () => {
       .fill(null)
       .map(() => new Array(10).fill(TileInfo.UNKNOWN));
     infoBoard[3][5] = TileInfo.HIT;
-    infoBoard[2][5] = TileInfo.HIT;
     player.updateLastAttack(3, 5);
-    getRandomInt.mockReturnValueOnce(2).mockReturnValueOnce(1);
+    shuffleArray.mockReturnValueOnce([
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ]);
 
     const [row, col] = player.getComputerAttack(infoBoard);
 
-    expect(getRandomInt).toHaveBeenCalledTimes(2);
     expect(row).toBe(4);
     expect(col).toBe(5);
   });

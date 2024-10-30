@@ -1,6 +1,6 @@
 import { NUM_OF_COLUMNS, NUM_OF_ROWS } from '../constants';
 import { TileInfo, createGameboard } from './gameboard';
-import { getRandomInt } from '../utils';
+import { getRandomInt, shuffleArray } from '../utils';
 
 export const PlayerType = Object.freeze({
   HUMAN: Symbol('human'),
@@ -74,31 +74,26 @@ export function createComputerPlayer() {
       lastAttack !== undefined &&
       infoBoard[lastAttack.row][lastAttack.col] === TileInfo.HIT
     ) {
-      const directions = [
+      const directions = shuffleArray([
         [0, 1],
         [1, 0],
         [-1, 0],
         [0, -1],
-      ];
+      ]);
 
-      let [dRow, dCol] = directions[getRandomInt(4)];
-      let row = lastAttack.row + dRow;
-      let col = lastAttack.col + dCol;
+      for (const [dRow, dCol] of directions) {
+        const row = lastAttack.row + dRow;
+        const col = lastAttack.col + dCol;
 
-      while (
-        row < 0 ||
-        row >= NUM_OF_ROWS ||
-        col < 0 ||
-        col >= NUM_OF_COLUMNS ||
-        infoBoard[row][col] === TileInfo.HIT
-      ) {
-        [dRow, dCol] = directions[getRandomInt(4)];
-        row = lastAttack.row + dRow;
-        col = lastAttack.col + dCol;
-      }
-
-      if (infoBoard[row][col] !== TileInfo.HIT) {
-        return [row, col];
+        if (
+          row >= 0 &&
+          row < NUM_OF_ROWS &&
+          col >= 0 &&
+          col < NUM_OF_COLUMNS &&
+          infoBoard[row][col] === TileInfo.UNKNOWN
+        ) {
+          return [row, col];
+        }
       }
     }
     let row = getRandomInt(10);
