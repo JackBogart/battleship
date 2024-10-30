@@ -1,4 +1,4 @@
-import { TileInfo } from './model/gameboard';
+import { TileInfoType } from './types';
 
 function createButton(className, text) {
   const button = document.createElement('button');
@@ -62,7 +62,7 @@ export function createView() {
         );
 
         if (
-          player.getTileInfo(row, col) === TileInfo.HIT &&
+          player.getTileInfo(row, col) === TileInfoType.HIT &&
           player.getShip(row, col).isSunk()
         ) {
           tile.style.backgroundColor = 'red';
@@ -90,7 +90,9 @@ export function createView() {
     const tile = attackedBoard.querySelector(
       `[data-row="${row}"][data-col="${col}"]`,
     );
-    tile.classList.add(tileInfo === TileInfo.HIT ? 'hit-cell' : 'miss-cell');
+    tile.classList.add(
+      tileInfo === TileInfoType.HIT ? 'hit-cell' : 'miss-cell',
+    );
   };
 
   const resetBoards = () => {

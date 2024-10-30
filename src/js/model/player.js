@@ -1,11 +1,7 @@
 import { NUM_OF_COLUMNS, NUM_OF_ROWS } from '../constants';
-import { TileInfo, createGameboard } from './gameboard';
-import { getRandomInt, shuffleArray } from '../utils';
-
-export const PlayerType = Object.freeze({
-  HUMAN: Symbol('human'),
-  COMPUTER: Symbol('computer'),
-});
+import { createGameboard } from './gameboard';
+import { PlayerType, TileInfoType } from '../types';
+import { getRandomInt, shuffleArray } from '../utils/random';
 
 export function createPlayer(name, playerType) {
   const gameboard = createGameboard();
@@ -72,7 +68,7 @@ export function createComputerPlayer() {
   const getComputerAttack = (infoBoard) => {
     if (
       lastAttack !== undefined &&
-      infoBoard[lastAttack.row][lastAttack.col] === TileInfo.HIT
+      infoBoard[lastAttack.row][lastAttack.col] === TileInfoType.HIT
     ) {
       const directions = shuffleArray([
         [0, 1],
@@ -90,7 +86,7 @@ export function createComputerPlayer() {
           row < NUM_OF_ROWS &&
           col >= 0 &&
           col < NUM_OF_COLUMNS &&
-          infoBoard[row][col] === TileInfo.UNKNOWN
+          infoBoard[row][col] === TileInfoType.UNKNOWN
         ) {
           return [row, col];
         }
@@ -99,7 +95,7 @@ export function createComputerPlayer() {
     let row = getRandomInt(10);
     let col = getRandomInt(10);
 
-    while (infoBoard[row][col] !== TileInfo.UNKNOWN) {
+    while (infoBoard[row][col] !== TileInfoType.UNKNOWN) {
       row = getRandomInt(10);
       col = getRandomInt(10);
     }

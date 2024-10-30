@@ -1,7 +1,7 @@
-import { TileInfo } from './model/gameboard';
-import { PlayerType, createComputerPlayer, createPlayer } from './model/player';
-import { ShipType, createShip } from './model/ship';
-import { getRandomInt } from './utils';
+import { createComputerPlayer, createPlayer } from './model/player';
+import { createShip } from './model/ship';
+import { PlayerType, ShipType, TileInfoType } from './types';
+import { getRandomInt } from './utils/random';
 import { createView } from './view';
 
 function placeShipRandomly(player, ship) {
@@ -58,7 +58,7 @@ export function createController() {
     view.receiveAttack(row, col, attackedTile, isPlayer1Turn);
 
     if (
-      attackedTile === TileInfo.HIT &&
+      attackedTile === TileInfoType.HIT &&
       attackedPlayer.getShip(row, col).isSunk()
     ) {
       const positionData = attackedPlayer.getInitialPosition(row, col);
@@ -103,7 +103,7 @@ export function createController() {
     }
     const attackedPlayer = isPlayer1Attacked ? player1 : player2;
 
-    if (attackedPlayer.getTileInfo(row, col) === TileInfo.UNKNOWN) {
+    if (attackedPlayer.getTileInfo(row, col) === TileInfoType.UNKNOWN) {
       playerTurn(attackedPlayer, row, col);
 
       if (isGameInProgress && isPlayer2Computer) {

@@ -1,7 +1,8 @@
-import { TileInfo, createGameboard } from './gameboard';
-import { PlayerType, createComputerPlayer, createPlayer } from './player';
+import { createGameboard } from './gameboard';
+import { createComputerPlayer, createPlayer } from './player';
 import { createShip } from './ship';
-import { getRandomInt, shuffleArray } from '../utils';
+import { PlayerType, TileInfoType } from '../types';
+import { getRandomInt, shuffleArray } from '../utils/random';
 
 jest.mock('./gameboard', () => {
   const originalModule = jest.requireActual('./gameboard');
@@ -12,7 +13,7 @@ jest.mock('./gameboard', () => {
     createGameboard: jest.fn(),
   };
 });
-jest.mock('../utils');
+jest.mock('../utils/random');
 jest.mock('./ship');
 
 const gameboardInstance = {
@@ -117,7 +118,7 @@ describe('computer player', () => {
   it('should return a valid attack location', () => {
     const infoBoard = new Array(10)
       .fill(null)
-      .map(() => new Array(10).fill(TileInfo.UNKNOWN));
+      .map(() => new Array(10).fill(TileInfoType.UNKNOWN));
     getRandomInt.mockReturnValueOnce(3).mockReturnValueOnce(5);
 
     const [row, col] = player.getComputerAttack(infoBoard);
@@ -129,8 +130,8 @@ describe('computer player', () => {
   it('should retry when a random location is already attacked', () => {
     const infoBoard = new Array(10)
       .fill(null)
-      .map(() => new Array(10).fill(TileInfo.UNKNOWN));
-    infoBoard[3][5] = TileInfo.HIT;
+      .map(() => new Array(10).fill(TileInfoType.UNKNOWN));
+    infoBoard[3][5] = TileInfoType.HIT;
     getRandomInt
       .mockReturnValueOnce(3)
       .mockReturnValueOnce(5)
@@ -147,8 +148,8 @@ describe('computer player', () => {
   it('should attack an adjacent tile when the last attack was a hit', () => {
     const infoBoard = new Array(10)
       .fill(null)
-      .map(() => new Array(10).fill(TileInfo.UNKNOWN));
-    infoBoard[3][5] = TileInfo.HIT;
+      .map(() => new Array(10).fill(TileInfoType.UNKNOWN));
+    infoBoard[3][5] = TileInfoType.HIT;
     player.updateLastAttack(3, 5);
     shuffleArray.mockReturnValueOnce([
       [1, 0],

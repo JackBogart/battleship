@@ -1,11 +1,3 @@
-export const ShipType = Object.freeze({
-  CARRIER: 'carrier',
-  BATTLESHIP: 'battleship',
-  DESTROYER: 'destroyer',
-  SUBMARINE: 'submarine',
-  PATROL_BOAT: 'patrol boat',
-});
-
 const shipSize = Object.freeze({
   'carrier': 5,
   'battleship': 4,

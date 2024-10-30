@@ -1,4 +1,5 @@
-import { ShipType, createShip } from './ship';
+import { createShip } from './ship';
+import { ShipType } from '../types';
 
 describe('Ship', () => {
   it('should return a length of 3', () => {

@@ -1,10 +1,5 @@
 import { NUM_OF_COLUMNS, NUM_OF_ROWS } from '../constants';
-
-export const TileInfo = Object.freeze({
-  UNKNOWN: Symbol('unknown'),
-  MISSED: Symbol('missed'),
-  HIT: Symbol('hit'),
-});
+import { TileInfoType } from '../types';
 
 export function createGameboard() {
   let shipData = {};
@@ -15,7 +10,7 @@ export function createGameboard() {
 
   const infoBoard = new Array(NUM_OF_ROWS)
     .fill(null)
-    .map(() => new Array(NUM_OF_COLUMNS).fill(TileInfo.UNKNOWN));
+    .map(() => new Array(NUM_OF_COLUMNS).fill(TileInfoType.UNKNOWN));
 
   const getShip = (row, col) => board[row][col];
 
@@ -65,10 +60,10 @@ export function createGameboard() {
 
   const receiveAttack = (row, col) => {
     if (board[row][col] === null) {
-      infoBoard[row][col] = TileInfo.MISSED;
+      infoBoard[row][col] = TileInfoType.MISSED;
     } else {
       board[row][col].hit();
-      infoBoard[row][col] = TileInfo.HIT;
+      infoBoard[row][col] = TileInfoType.HIT;
     }
   };
 
