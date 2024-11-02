@@ -167,8 +167,8 @@ describe('getInitialPosition', () => {
     gameboard.setShip(ship1, 2, 1, true);
     gameboard.setShip(ship2, 5, 7, false);
 
-    const positionData1 = gameboard.getInitialPosition(2, 1);
-    const positionData2 = gameboard.getInitialPosition(5, 7);
+    const positionData1 = gameboard.getInitialPosition('electric boogaloo');
+    const positionData2 = gameboard.getInitialPosition('electric boogaloo 2');
 
     const expected1 = {
       row: 2,
@@ -185,7 +185,7 @@ describe('getInitialPosition', () => {
   });
 
   it("should return undefined when the ship type hasn't been placed", () => {
-    const positionData = gameboard.getInitialPosition(2, 1);
+    const positionData = gameboard.getInitialPosition('electric boogaloo');
 
     expect(positionData).toBeUndefined();
   });
@@ -204,9 +204,11 @@ describe('removeShip', () => {
 
     expect(gameboard.getShip(2, 1)).toBeNull();
     expect(gameboard.getShip(3, 1)).toBeNull();
-    expect(gameboard.getInitialPosition(2, 1)).toBeUndefined();
+    expect(gameboard.getInitialPosition('electric boogaloo')).toBeUndefined();
     expect(gameboard.getShip(5, 7)).not.toBeNull();
-    expect(gameboard.getInitialPosition(5, 7)).not.toBeUndefined();
+    expect(
+      gameboard.getInitialPosition('electric boogaloo 2'),
+    ).not.toBeUndefined();
   });
 
   it('should throw and error when ship being removed is null', () => {
@@ -229,10 +231,10 @@ describe('removeAllShips', () => {
 
     expect(gameboard.getShip(2, 1)).toBeNull();
     expect(gameboard.getShip(3, 1)).toBeNull();
-    expect(gameboard.getInitialPosition(3, 1)).toBeUndefined();
+    expect(gameboard.getInitialPosition('electric boogaloo')).toBeUndefined();
     expect(gameboard.getShip(5, 7)).toBeNull();
     expect(gameboard.getShip(5, 8)).toBeNull();
     expect(gameboard.getShip(5, 9)).toBeNull();
-    expect(gameboard.getInitialPosition(5, 8)).toBeUndefined();
+    expect(gameboard.getInitialPosition('electric boogaloo 2')).toBeUndefined();
   });
 });

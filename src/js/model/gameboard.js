@@ -70,12 +70,12 @@ export function createGameboard() {
   const isFleetSunk = () =>
     Object.values(shipData).every((entry) => entry.ship.isSunk());
 
-  const getInitialPosition = (row, col) => {
-    if (board[row][col] === null) {
+  const getInitialPosition = (shipType) => {
+    if (shipData[shipType] === undefined) {
       return undefined;
     }
 
-    const ship = shipData[board[row][col].getType()];
+    const ship = shipData[shipType];
     return {
       row: ship.row,
       col: ship.col,

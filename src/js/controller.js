@@ -61,8 +61,8 @@ export function createController() {
       attackedTile === TileInfoType.HIT &&
       attackedPlayer.getShip(row, col).isSunk()
     ) {
-      const positionData = attackedPlayer.getInitialPosition(row, col);
       const ship = attackedPlayer.getShip(row, col);
+      const positionData = attackedPlayer.getInitialPosition(ship.getType());
 
       view.renderSunkenShip(
         !isPlayer1Turn,

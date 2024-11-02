@@ -1,9 +1,9 @@
-const shipSize = Object.freeze({
+export const shipSize = Object.freeze({
   'carrier': 5,
   'battleship': 4,
   'destroyer': 3,
   'submarine': 3,
-  'patrol boat': 2,
+  'patrol-boat': 2,
 });
 
 export function createShip(shipType) {
