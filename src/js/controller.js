@@ -4,38 +4,6 @@ import { PlayerType, ShipType, TileInfoType } from './types';
 import { getRandomInt } from './utils/random';
 import { createView, getXYOffsets } from './view';
 
-function placeShipRandomly(player, ship, view) {
-  let row = getRandomInt(10);
-  let col = getRandomInt(10);
-  let isVertical = getRandomInt(2) === 0;
-
-  while (!player.isValidPlacement(ship, row, col, isVertical)) {
-    row = getRandomInt(10);
-    col = getRandomInt(10);
-    isVertical = getRandomInt(2) === 0;
-  }
-
-  player.setShip(ship, row, col, isVertical);
-  if (player.getName() === 'Player') {
-    view.createShip(row, col, isVertical, ship, true);
-  }
-}
-
-// TODO: Change this to randomize a given player's board
-function tempInitBoards(player1, player2, view) {
-  placeShipRandomly(player1, createShip(ShipType.CARRIER), view);
-  placeShipRandomly(player1, createShip(ShipType.BATTLESHIP), view);
-  placeShipRandomly(player1, createShip(ShipType.DESTROYER), view);
-  placeShipRandomly(player1, createShip(ShipType.SUBMARINE), view);
-  placeShipRandomly(player1, createShip(ShipType.PATROL_BOAT), view);
-
-  placeShipRandomly(player2, createShip(ShipType.CARRIER), view);
-  placeShipRandomly(player2, createShip(ShipType.BATTLESHIP), view);
-  placeShipRandomly(player2, createShip(ShipType.DESTROYER), view);
-  placeShipRandomly(player2, createShip(ShipType.SUBMARINE), view);
-  placeShipRandomly(player2, createShip(ShipType.PATROL_BOAT), view);
-}
-
 export function createController() {
   const view = createView();
   let player1 = createPlayer('Player', PlayerType.HUMAN);
@@ -86,6 +54,32 @@ export function createController() {
     isPlayer1Turn = !isPlayer1Turn;
   };
 
+  const placeShipRandomly = (player, ship) => {
+    let row = getRandomInt(10);
+    let col = getRandomInt(10);
+    let isVertical = getRandomInt(2) === 0;
+
+    while (!player.isValidPlacement(ship, row, col, isVertical)) {
+      row = getRandomInt(10);
+      col = getRandomInt(10);
+      isVertical = getRandomInt(2) === 0;
+    }
+
+    player.setShip(ship, row, col, isVertical);
+    if (player.getName() === 'Player') {
+      // For placement system, temporary will need to do this in a better way
+      view.createShip(row, col, isVertical, ship, true);
+    }
+  };
+
+  const randomizeBoard = (player) => {
+    placeShipRandomly(player, createShip(ShipType.CARRIER));
+    placeShipRandomly(player, createShip(ShipType.BATTLESHIP));
+    placeShipRandomly(player, createShip(ShipType.DESTROYER));
+    placeShipRandomly(player, createShip(ShipType.SUBMARINE));
+    placeShipRandomly(player, createShip(ShipType.PATROL_BOAT));
+  };
+
   /**
    * Handler function for a board being attacked. It will take the coordinates
    * of the tile being attacked, along with a boolean that represents if it's
@@ -121,9 +115,8 @@ export function createController() {
 
   const handleRandomizeShips = () => {
     player1.removeAllShips();
-    player2.removeAllShips();
-    tempInitBoards(player1, player2, view);
-    view.renderAllPlayerShips(true, player1);
+    view.removeDraggableShips();
+    randomizeBoard(player1);
   };
 
   const handleStartGame = () => {
@@ -139,8 +132,8 @@ export function createController() {
     player2 = createComputerPlayer();
     isGameInProgress = false;
     isPlayer1Turn = true;
-    tempInitBoards(player1, player2, view);
-    view.renderAllPlayerShips(true, player1);
+    randomizeBoard(player1);
+    randomizeBoard(player2);
     view.addPreGameControls();
   };
 
@@ -222,7 +215,8 @@ export function createController() {
       dragOver: dragoverHandler,
       drop: dropHandler,
     });
-    tempInitBoards(player1, player2, view);
+    randomizeBoard(player1);
+    randomizeBoard(player2);
   };
 
   return { run };
