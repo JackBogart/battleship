@@ -95,7 +95,7 @@ export function createController() {
    * @param {number} col - The column being attacked
    * @param {boolean} isPlayer1Attacked - true if player 1 is being attacked
    */
-  const handleReceiveAttack = (row, col, isPlayer1Attacked) => {
+  const receiveAttackHandler = (row, col, isPlayer1Attacked) => {
     const isPlayer2Computer = player2.getType() === PlayerType.COMPUTER;
     if (
       (isPlayer1Attacked && isPlayer2Computer) ||
@@ -152,6 +152,8 @@ export function createController() {
       event.dataTransfer.setData('text/plain', shipContainer.id);
       event.dataTransfer.setDragImage(shipContainer, offsetX, offsetY);
       event.dataTransfer.dropEffect = 'move';
+
+      shipContainer.style.pointerEvents = 'none';
     }
   };
 
@@ -172,7 +174,6 @@ export function createController() {
       event.dataTransfer.getData('text/plain') !== ''
     ) {
       event.preventDefault();
-      // Extract to a helper function
       const player = isPlayer1Turn ? player1 : player2;
       const newRow = Number(event.target.dataset.row);
       const newCol = Number(event.target.dataset.col);
@@ -190,9 +191,26 @@ export function createController() {
     }
   };
 
+  const rotateShipHandler = (shipType) => {
+    const player = isPlayer1Turn ? player1 : player2;
+    const { row, col, isVertical } = player.getInitialPosition(shipType);
+    const ship = player.getShip(row, col);
+
+    player.removeShip(row, col);
+    if (player.isValidPlacement(ship, row, col, !isVertical)) {
+      player.setShip(ship, row, col, !isVertical);
+      view.placeShip(row, col, !isVertical, ship, isPlayer1Turn);
+    } else {
+      player.setShip(ship, row, col, isVertical);
+    }
+  };
+
   const run = () => {
     view.init();
-    view.bindReceiveAttack(handleReceiveAttack);
+    view.bindClick({
+      receiveAttack: receiveAttackHandler,
+      rotate: rotateShipHandler,
+    });
     view.bindButtons({
       randomize: handleRandomizeShips,
       start: handleStartGame,

@@ -163,9 +163,11 @@ export function createView() {
     }
 
     if (isVertical) {
+      shipElement.classList.add('vertical');
       shipElement.style.gridRow = `${row + 1} / ${row + ship.getLength() + 1}`;
       shipElement.style.gridColumn = `${col + 1} / ${col + 2}`;
     } else {
+      shipElement.classList.remove('vertical');
       shipElement.style.gridRow = `${row + 1} / ${row + 2}`;
       shipElement.style.gridColumn = `${col + 1} / ${col + ship.getLength() + 1}`;
     }
@@ -178,18 +180,18 @@ export function createView() {
   };
 
   // Binders below
-  const bindReceiveAttack = (handler) => {
+  const bindClick = (handlers) => {
     gameboards.forEach((gameboard) => {
       gameboard.addEventListener('click', (event) => {
-        if (!event.target.classList.contains('grid-cell')) {
-          return;
+        if (event.target.classList.contains('grid-cell')) {
+          const isPlayer1Board = event.currentTarget === player1Board;
+          const row = event.target.dataset.row;
+          const col = event.target.dataset.col;
+
+          handlers.receiveAttack(row, col, isPlayer1Board);
+        } else if (event.target.classList.contains('ship-container')) {
+          handlers.rotate(event.target.id);
         }
-
-        const isPlayer1Board = event.currentTarget === player1Board;
-        const row = event.target.dataset.row;
-        const col = event.target.dataset.col;
-
-        handler(row, col, isPlayer1Board);
       });
     });
   };
@@ -207,45 +209,35 @@ export function createView() {
   };
 
   const bindDragAndDrop = (handlers) => {
-    player1Board.addEventListener('dragstart', (event) => {
-      handlers.dragStart(event);
-    });
+    player1Board.addEventListener('dragstart', handlers.dragStart);
 
-    player1Board.addEventListener('dragend', (event) => {
-      handlers.dragEnd(event);
-    });
+    player1Board.addEventListener('dragend', handlers.dragEnd);
 
-    player1Board.addEventListener('dragover', (event) => {
-      handlers.dragOver(event);
-    });
+    player1Board.addEventListener('dragover', handlers.dragOver);
 
-    player1Board.addEventListener('drop', (event) => {
-      handlers.drop(event);
-    });
+    player1Board.addEventListener('drop', handlers.drop);
   };
 
   return {
-    receiveAttack,
-    init,
-    renderAllPlayerShips,
-    bindReceiveAttack,
-    bindButtons,
-    reportGameOver,
-    renderSunkenShip,
-    removePreGameControls,
     addPreGameControls,
-    resetBoards,
-    renderAllSunkenShips,
-    createShip,
-    placeShip,
+    bindButtons,
+    bindClick,
     bindDragAndDrop,
+    createShip,
+    init,
+    placeShip,
+    receiveAttack,
     removeDraggableShips,
+    removePreGameControls,
+    renderAllPlayerShips,
+    renderAllSunkenShips,
+    renderSunkenShip,
+    reportGameOver,
+    resetBoards,
   };
 }
 
 export function getXYOffsets(ship) {
-  ship.style.pointerEvents = 'none';
-
   // Divide main axis by x2 number of nodes to get center of the first node
   if (ship.classList.contains('vertical')) {
     return {
