@@ -129,6 +129,54 @@ export function createView() {
     buttons.replaceChildren();
   };
 
+  // TODO: Need to refactor, ship shouldn't be created onto the board
+  const createShip = (row, col, isVertical, ship, isPlayer1) => {
+    const board = isPlayer1 ? player1Board : player2Board;
+    const shipContainer = document.createElement('div');
+    shipContainer.id = `${ship.getType()}`;
+    shipContainer.classList.add('ship-container');
+    shipContainer.draggable = true;
+
+    if (isVertical) {
+      shipContainer.style.gridRow = `${row + 1} / ${row + ship.getLength() + 1}`;
+      shipContainer.style.gridColumn = `${col + 1} / ${col + 2}`;
+      shipContainer.classList.add('vertical');
+    } else {
+      shipContainer.style.gridRow = `${row + 1} / ${row + 2}`;
+      shipContainer.style.gridColumn = `${col + 1} / ${col + ship.getLength() + 1}`;
+    }
+
+    for (let i = 0; i < ship.getLength(); i++) {
+      shipContainer.appendChild(document.createElement('div'));
+    }
+
+    board.appendChild(shipContainer);
+  };
+
+  const placeShip = (row, col, isVertical, ship, isPlayer1) => {
+    const board = isPlayer1 ? player1Board : player2Board;
+    const shipElement = document.querySelector(`#${ship.getType()}`);
+
+    // When the ship isn't placed on the board yet, (first placement)
+    if (board.querySelector(`#${ship.getType()}`) === null) {
+      board.appendChild(shipElement);
+    }
+
+    if (isVertical) {
+      shipElement.style.gridRow = `${row + 1} / ${row + ship.getLength() + 1}`;
+      shipElement.style.gridColumn = `${col + 1} / ${col + 2}`;
+    } else {
+      shipElement.style.gridRow = `${row + 1} / ${row + 2}`;
+      shipElement.style.gridColumn = `${col + 1} / ${col + ship.getLength() + 1}`;
+    }
+  };
+
+  const removeDraggableShips = () => {
+    document.querySelectorAll('.ship-container').forEach((ele) => {
+      ele.remove();
+    });
+  };
+
   // Binders below
   const bindReceiveAttack = (handler) => {
     gameboards.forEach((gameboard) => {
@@ -158,6 +206,24 @@ export function createView() {
     });
   };
 
+  const bindDragAndDrop = (handlers) => {
+    player1Board.addEventListener('dragstart', (event) => {
+      handlers.dragStart(event);
+    });
+
+    player1Board.addEventListener('dragend', (event) => {
+      handlers.dragEnd(event);
+    });
+
+    player1Board.addEventListener('dragover', (event) => {
+      handlers.dragOver(event);
+    });
+
+    player1Board.addEventListener('drop', (event) => {
+      handlers.drop(event);
+    });
+  };
+
   return {
     receiveAttack,
     init,
@@ -170,5 +236,26 @@ export function createView() {
     addPreGameControls,
     resetBoards,
     renderAllSunkenShips,
+    createShip,
+    placeShip,
+    bindDragAndDrop,
+    removeDraggableShips,
+  };
+}
+
+export function getXYOffsets(ship) {
+  ship.style.pointerEvents = 'none';
+
+  // Divide main axis by x2 number of nodes to get center of the first node
+  if (ship.classList.contains('vertical')) {
+    return {
+      offsetX: Number(ship.offsetWidth) / 2,
+      offsetY: Number(ship.offsetHeight) / (Number(ship.childElementCount) * 2),
+    };
+  }
+
+  return {
+    offsetX: Number(ship.offsetWidth) / (Number(ship.childElementCount) * 2),
+    offsetY: Number(ship.offsetHeight) / 2,
   };
 }

@@ -2,9 +2,9 @@ import { createComputerPlayer, createPlayer } from './model/player';
 import { createShip } from './model/ship';
 import { PlayerType, ShipType, TileInfoType } from './types';
 import { getRandomInt } from './utils/random';
-import { createView } from './view';
+import { createView, getXYOffsets } from './view';
 
-function placeShipRandomly(player, ship) {
+function placeShipRandomly(player, ship, view) {
   let row = getRandomInt(10);
   let col = getRandomInt(10);
   let isVertical = getRandomInt(2) === 0;
@@ -16,21 +16,24 @@ function placeShipRandomly(player, ship) {
   }
 
   player.setShip(ship, row, col, isVertical);
+  if (player.getName() === 'Player') {
+    view.createShip(row, col, isVertical, ship, true);
+  }
 }
 
 // TODO: Change this to randomize a given player's board
-function tempInitBoards(player1, player2) {
-  placeShipRandomly(player1, createShip(ShipType.CARRIER));
-  placeShipRandomly(player1, createShip(ShipType.BATTLESHIP));
-  placeShipRandomly(player1, createShip(ShipType.DESTROYER));
-  placeShipRandomly(player1, createShip(ShipType.SUBMARINE));
-  placeShipRandomly(player1, createShip(ShipType.PATROL_BOAT));
+function tempInitBoards(player1, player2, view) {
+  placeShipRandomly(player1, createShip(ShipType.CARRIER), view);
+  placeShipRandomly(player1, createShip(ShipType.BATTLESHIP), view);
+  placeShipRandomly(player1, createShip(ShipType.DESTROYER), view);
+  placeShipRandomly(player1, createShip(ShipType.SUBMARINE), view);
+  placeShipRandomly(player1, createShip(ShipType.PATROL_BOAT), view);
 
-  placeShipRandomly(player2, createShip(ShipType.CARRIER));
-  placeShipRandomly(player2, createShip(ShipType.BATTLESHIP));
-  placeShipRandomly(player2, createShip(ShipType.DESTROYER));
-  placeShipRandomly(player2, createShip(ShipType.SUBMARINE));
-  placeShipRandomly(player2, createShip(ShipType.PATROL_BOAT));
+  placeShipRandomly(player2, createShip(ShipType.CARRIER), view);
+  placeShipRandomly(player2, createShip(ShipType.BATTLESHIP), view);
+  placeShipRandomly(player2, createShip(ShipType.DESTROYER), view);
+  placeShipRandomly(player2, createShip(ShipType.SUBMARINE), view);
+  placeShipRandomly(player2, createShip(ShipType.PATROL_BOAT), view);
 }
 
 export function createController() {
@@ -119,13 +122,15 @@ export function createController() {
   const handleRandomizeShips = () => {
     player1.removeAllShips();
     player2.removeAllShips();
-    tempInitBoards(player1, player2);
+    tempInitBoards(player1, player2, view);
     view.renderAllPlayerShips(true, player1);
   };
 
   const handleStartGame = () => {
     isGameInProgress = true;
     view.removePreGameControls();
+    view.removeDraggableShips();
+    view.renderAllPlayerShips(true, player1);
   };
 
   const handlePlayAgain = () => {
@@ -134,9 +139,55 @@ export function createController() {
     player2 = createComputerPlayer();
     isGameInProgress = false;
     isPlayer1Turn = true;
-    tempInitBoards(player1, player2);
+    tempInitBoards(player1, player2, view);
     view.renderAllPlayerShips(true, player1);
     view.addPreGameControls();
+  };
+
+  const dragstartHandler = (event) => {
+    if (event.target.classList.contains('ship-container')) {
+      const shipContainer = event.target;
+      const { offsetX, offsetY } = getXYOffsets(shipContainer);
+
+      event.dataTransfer.setData('text/plain', shipContainer.id);
+      event.dataTransfer.setDragImage(shipContainer, offsetX, offsetY);
+      event.dataTransfer.dropEffect = 'move';
+    }
+  };
+
+  const dragendHandler = (event) => {
+    if (event.target.classList.contains('ship-container')) {
+      event.target.style.pointerEvents = 'auto';
+    }
+  };
+
+  const dragoverHandler = (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+  };
+
+  const dropHandler = (event) => {
+    if (
+      event.target.classList.contains('grid-cell') &&
+      event.dataTransfer.getData('text/plain') !== ''
+    ) {
+      event.preventDefault();
+      // Extract to a helper function
+      const player = isPlayer1Turn ? player1 : player2;
+      const newRow = Number(event.target.dataset.row);
+      const newCol = Number(event.target.dataset.col);
+      const shipType = event.dataTransfer.getData('text/plain');
+      const { row, col, isVertical } = player.getInitialPosition(shipType);
+      const ship = player.getShip(row, col);
+
+      player.removeShip(row, col);
+      if (player.isValidPlacement(ship, newRow, newCol, isVertical)) {
+        player.setShip(ship, newRow, newCol, isVertical);
+        view.placeShip(newRow, newCol, isVertical, ship, isPlayer1Turn);
+      } else {
+        player.setShip(ship, row, col, isVertical);
+      }
+    }
   };
 
   const run = () => {
@@ -147,8 +198,13 @@ export function createController() {
       start: handleStartGame,
       playAgain: handlePlayAgain,
     });
-    tempInitBoards(player1, player2);
-    view.renderAllPlayerShips(true, player1);
+    view.bindDragAndDrop({
+      dragStart: dragstartHandler,
+      dragEnd: dragendHandler,
+      dragOver: dragoverHandler,
+      drop: dropHandler,
+    });
+    tempInitBoards(player1, player2, view);
   };
 
   return { run };

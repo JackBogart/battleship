@@ -98,6 +98,25 @@ body {
     no-repeat;
 }
 
+.ship-container {
+  display: flex;
+  gap: var(--grid-border-size);
+  background-color: black;
+  outline: var(--grid-border-color) var(--grid-border-size) solid;
+}
+
+.ship-container.vertical {
+  flex-direction: column;
+}
+
+.ship-container > * {
+  background-color: grey;
+  /* flex-grow: 1; */
+  pointer-events: none;
+  width: var(--grid-cell-size);
+  height: var(--grid-cell-size);
+}
+
 .github-banner {
   display: flex;
   justify-content: center;
