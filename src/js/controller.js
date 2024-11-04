@@ -141,31 +141,60 @@ export function createController() {
     if (event.target.classList.contains('ship-container')) {
       const shipContainer = event.target;
       const { offsetX, offsetY } = getXYOffsets(shipContainer);
+      const dragImage = view.getShipDragImage(shipContainer.dataset.type);
 
-      event.dataTransfer.setData('text/plain', shipContainer.id);
-      event.dataTransfer.setDragImage(shipContainer, offsetX, offsetY);
+      event.dataTransfer.setData('text/plain', shipContainer.dataset.type);
+      event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
       event.dataTransfer.dropEffect = 'move';
 
-      shipContainer.style.pointerEvents = 'none';
+      // This sucks. This is a workaround due to a long existing bug in chrome.
+      // If you manipulate DOM nodes during the 'dragstart' event, chrome
+      // immediately fires the 'dragend' event. It's ridiculous that this
+      // issue exists at least as far back as 2013. The drag and drop API spec
+      // is awful in general. https://stackoverflow.com/questions/11927309
+      setTimeout(() => {
+        view.disableDraggableShipEvents();
+        view.createShipInsertionMarker(shipContainer);
+        view.activateDragImage(dragImage);
+      }, 0);
     }
   };
 
   const dragendHandler = (event) => {
     if (event.target.classList.contains('ship-container')) {
-      event.target.style.pointerEvents = 'auto';
+      view.enableDraggableShipEvents();
+      view.removeShipInsertionMarker();
     }
   };
 
   const dragoverHandler = (event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
+    if (event.target.classList.contains('grid-cell')) {
+      event.preventDefault();
+      event.dataTransfer.dropEffect = 'move';
+
+      const player = isPlayer1Turn ? player1 : player2;
+      const newRow = Number(event.target.dataset.row);
+      const newCol = Number(event.target.dataset.col);
+      const shipType = view.getActiveDragImageType();
+      const { row, col, isVertical } = player.getInitialPosition(shipType);
+      const ship = player.getShip(row, col);
+      const isValid = player.isValidPlacement(ship, newRow, newCol, isVertical);
+
+      view.moveShipInsertionMarker(
+        newRow,
+        newCol,
+        isValid,
+        ship.getLength(),
+        isVertical,
+      );
+    } else if (event.target.classList.contains('gameboard')) {
+      const temp = document.querySelector('#insertion-marker');
+      temp.style.visibility = 'hidden';
+    }
   };
 
   const dropHandler = (event) => {
-    if (
-      event.target.classList.contains('grid-cell') &&
-      event.dataTransfer.getData('text/plain') !== ''
-    ) {
+    if (event.dataTransfer.getData('text/plain') !== '') {
       event.preventDefault();
       const player = isPlayer1Turn ? player1 : player2;
       const newRow = Number(event.target.dataset.row);
@@ -174,12 +203,10 @@ export function createController() {
       const { row, col, isVertical } = player.getInitialPosition(shipType);
       const ship = player.getShip(row, col);
 
-      player.removeShip(row, col);
       if (player.isValidPlacement(ship, newRow, newCol, isVertical)) {
+        player.removeShip(row, col);
         player.setShip(ship, newRow, newCol, isVertical);
         view.placeShip(newRow, newCol, isVertical, ship, isPlayer1Turn);
-      } else {
-        player.setShip(ship, row, col, isVertical);
       }
     }
   };
@@ -189,12 +216,10 @@ export function createController() {
     const { row, col, isVertical } = player.getInitialPosition(shipType);
     const ship = player.getShip(row, col);
 
-    player.removeShip(row, col);
     if (player.isValidPlacement(ship, row, col, !isVertical)) {
+      player.removeShip(row, col);
       player.setShip(ship, row, col, !isVertical);
       view.placeShip(row, col, !isVertical, ship, isPlayer1Turn);
-    } else {
-      player.setShip(ship, row, col, isVertical);
     }
   };
 

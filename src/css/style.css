@@ -35,6 +35,9 @@
   --grid-border-size: 0.125rem;
   --grid-border-color: hsl(0, 0%, 12%);
   --grid-cell-color: hsl(0, 0%, 100%);
+  --ship-cell-color: hsl(0, 0%, 55%);
+  --valid-marker-color: hsl(120, 78%, 72%);
+  --invalid-marker-color: hsl(3, 100%, 71%);
 }
 
 body {
@@ -101,8 +104,8 @@ body {
 .ship-container {
   display: flex;
   gap: var(--grid-border-size);
-  background-color: black;
-  outline: var(--grid-border-color) var(--grid-border-size) solid;
+  background-color: var(--grid-border-color);
+  cursor: grab;
 }
 
 .ship-container.vertical {
@@ -110,11 +113,22 @@ body {
 }
 
 .ship-container > * {
-  background-color: grey;
-  /* flex-grow: 1; */
+  background-color: var(--ship-cell-color);
+  flex-grow: 1;
   pointer-events: none;
-  width: var(--grid-cell-size);
-  height: var(--grid-cell-size);
+}
+
+#insertion-marker > * {
+  background-color: var(--valid-marker-color);
+}
+
+#insertion-marker.invalid > * {
+  background-color: var(--invalid-marker-color);
+}
+
+.drag-image {
+  border: var(--grid-border-color) var(--grid-border-size) solid;
+  background-color: hsla(0, 0%, 0%, 0.55);
 }
 
 .github-banner {

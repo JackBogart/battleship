@@ -1,3 +1,4 @@
+import { NUM_OF_COLUMNS, NUM_OF_ROWS } from './constants';
 import { TileInfoType } from './types';
 
 function createButton(className, text) {
@@ -43,7 +44,9 @@ export function createView() {
         );
 
         if (player.getShip(row, col) !== null) {
-          tile.style.backgroundColor = 'grey';
+          tile.style.backgroundColor = getComputedStyle(
+            document.documentElement,
+          ).getPropertyValue('--ship-cell-color');
         } else {
           tile.style.backgroundColor = '';
         }
@@ -129,11 +132,28 @@ export function createView() {
     buttons.replaceChildren();
   };
 
+  const createShipDragImage = (shipElement) => {
+    const dragImage = shipElement.cloneNode(true);
+
+    dragImage.classList.add('drag-image');
+    dragImage.style.zIndex = '-2';
+
+    player1Board.appendChild(dragImage);
+  };
+
+  const getShipDragImage = (shipType) =>
+    document.querySelector(`.drag-image[data-type="${shipType}"]`);
+
+  const removeShipDragImage = (shipType) => {
+    const dragImage = getShipDragImage(shipType);
+    dragImage.remove();
+  };
+
   // TODO: Need to refactor, ship shouldn't be created onto the board
   const createShip = (row, col, isVertical, ship, isPlayer1) => {
     const board = isPlayer1 ? player1Board : player2Board;
     const shipContainer = document.createElement('div');
-    shipContainer.id = `${ship.getType()}`;
+    shipContainer.dataset.type = `${ship.getType()}`;
     shipContainer.classList.add('ship-container');
     shipContainer.draggable = true;
 
@@ -151,14 +171,16 @@ export function createView() {
     }
 
     board.appendChild(shipContainer);
+    createShipDragImage(shipContainer);
   };
 
   const placeShip = (row, col, isVertical, ship, isPlayer1) => {
     const board = isPlayer1 ? player1Board : player2Board;
-    const shipElement = document.querySelector(`#${ship.getType()}`);
+    const shipSelector = `.ship-container[data-type="${ship.getType()}"]`;
+    const shipElement = document.querySelector(shipSelector);
 
     // When the ship isn't placed on the board yet, (first placement)
-    if (board.querySelector(`#${ship.getType()}`) === null) {
+    if (board.querySelector(shipSelector) === null) {
       board.appendChild(shipElement);
     }
 
@@ -171,6 +193,9 @@ export function createView() {
       shipElement.style.gridRow = `${row + 1} / ${row + 2}`;
       shipElement.style.gridColumn = `${col + 1} / ${col + ship.getLength() + 1}`;
     }
+
+    removeShipDragImage(ship.getType());
+    createShipDragImage(shipElement);
   };
 
   const removeDraggableShips = () => {
@@ -178,6 +203,85 @@ export function createView() {
       ele.remove();
     });
   };
+
+  const createShipInsertionMarker = (shipElement) => {
+    const marker = shipElement.cloneNode(true);
+    marker.style.opacity = '1';
+    marker.id = 'insertion-marker';
+
+    player1Board.appendChild(marker);
+  };
+
+  const removeShipInsertionMarker = () => {
+    document.querySelector('#insertion-marker').remove();
+  };
+
+  const resizeMarker = (marker, isVertical, rowEnd, colEnd, length) => {
+    const markerEnd = isVertical ? rowEnd : colEnd;
+    const maxCells = isVertical ? NUM_OF_ROWS + 1 : NUM_OF_COLUMNS + 1;
+
+    // If the marker's end exceeds the grid, resize the marker
+    const markerLength =
+      markerEnd > maxCells ? length - (markerEnd - maxCells) : length;
+
+    const markerCells = [];
+    for (let i = 0; i < markerLength; i++) {
+      markerCells.push(document.createElement('div'));
+    }
+    marker.replaceChildren(...markerCells);
+  };
+
+  const moveShipInsertionMarker = (row, col, isValid, length, isVertical) => {
+    const marker = document.querySelector('#insertion-marker');
+    marker.style.visibility = 'visible';
+
+    const computedStyle = window.getComputedStyle(marker);
+    const currentRowStart = Number(computedStyle.gridRowStart);
+    const currentColStart = Number(computedStyle.gridColumnStart);
+
+    const rowSpan = isVertical ? length : 1;
+    const colSpan = !isVertical ? length : 1;
+
+    const rowEnd = row + rowSpan + 1;
+    const colEnd = col + colSpan + 1;
+
+    resizeMarker(marker, isVertical, rowEnd, colEnd, length);
+
+    if (row !== currentRowStart - 1) {
+      marker.style.gridRow = `${row + 1} / ${Math.min(rowEnd, NUM_OF_ROWS + 1)}`;
+    }
+
+    if (col !== currentColStart - 1) {
+      marker.style.gridColumn = `${col + 1} / ${Math.min(colEnd, NUM_OF_COLUMNS + 1)}`;
+    }
+
+    if (!isValid) {
+      marker.classList.add('invalid');
+    } else {
+      marker.classList.remove('invalid');
+    }
+  };
+
+  const disableDraggableShipEvents = () => {
+    const ships = document.querySelectorAll('.ship-container');
+    ships.forEach((ship) => {
+      ship.style.pointerEvents = 'none';
+    });
+  };
+
+  const enableDraggableShipEvents = () => {
+    const ships = document.querySelectorAll('.ship-container');
+    ships.forEach((ship) => {
+      ship.style.pointerEvents = 'auto';
+    });
+  };
+
+  const activateDragImage = (element) => {
+    element.classList.add('active');
+  };
+
+  const getActiveDragImageType = () =>
+    document.querySelector('.drag-image.active').dataset.type;
 
   // Binders below
   const bindClick = (handlers) => {
@@ -190,7 +294,7 @@ export function createView() {
 
           handlers.receiveAttack(row, col, isPlayer1Board);
         } else if (event.target.classList.contains('ship-container')) {
-          handlers.rotate(event.target.id);
+          handlers.rotate(event.target.dataset.type);
         }
       });
     });
@@ -220,14 +324,24 @@ export function createView() {
 
   return {
     addPreGameControls,
+    activateDragImage,
     bindButtons,
     bindClick,
     bindDragAndDrop,
+    createShipDragImage,
+    createShipInsertionMarker,
     createShip,
+    disableDraggableShipEvents,
+    enableDraggableShipEvents,
+    getActiveDragImageType,
+    getShipDragImage,
     init,
+    moveShipInsertionMarker,
     placeShip,
     receiveAttack,
     removeDraggableShips,
+    removeShipDragImage,
+    removeShipInsertionMarker,
     removePreGameControls,
     renderAllPlayerShips,
     renderAllSunkenShips,

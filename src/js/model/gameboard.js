@@ -29,7 +29,8 @@ export function createGameboard() {
       const currentRow = isVertical ? row + i : row;
       const currentCol = isVertical ? col : col + i;
 
-      if (board[currentRow][currentCol] !== null) {
+      // Only null tiles allowed unless the ship is being moved onto itself
+      if (![ship, null].includes(board[currentRow][currentCol])) {
         return false;
       }
     }

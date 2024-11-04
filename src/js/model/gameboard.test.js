@@ -92,6 +92,16 @@ describe('isValidPlacement', () => {
 
     expect(isValidPlacement).toBe(false);
   });
+
+  it('should return true when ships placement overlaps itself', () => {
+    const ship1 = createShip('destroyer');
+    ship1.getLength.mockReturnValue(3);
+    gameboard.setShip(ship1, 2, 3, false);
+
+    const isValidPlacement = gameboard.isValidPlacement(ship1, 2, 2, false);
+
+    expect(isValidPlacement).toBe(true);
+  });
 });
 
 describe('infoBoard', () => {

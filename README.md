@@ -2,7 +2,7 @@
 
 ### Todo
 
-- Implement drag and drop system
+- Review drag and drop implementation
 - Implement two player mode
   - Adjust rendering to account for two player mode
 - Redesign the page layout. Currently it uses a very generic layout that I made
@@ -15,3 +15,7 @@
   - Not sure how to do this in a way that looks good. Currently I've moved this
     to the bottom but the idea might be dropped. Need to brainstorm.
 - Clean up the README to show off the project
+- Look into why drag and drop API cursors aren't appearing without CSS
+- Re-examine the drag and drop system, should we remove and create or adjust?
+- Bug with chrome where after rotating, drag doesn't work first try?
+  - Need to investigate
