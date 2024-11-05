@@ -17,5 +17,3 @@
 - Clean up the README to show off the project
 - Look into why drag and drop API cursors aren't appearing without CSS
 - Re-examine the drag and drop system, should we remove and create or adjust?
-- Bug with chrome where after rotating, drag doesn't work first try?
-  - Need to investigate

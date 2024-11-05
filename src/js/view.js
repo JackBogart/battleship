@@ -136,7 +136,6 @@ export function createView() {
     const dragImage = shipElement.cloneNode(true);
 
     dragImage.classList.add('drag-image');
-    dragImage.style.zIndex = '-2';
 
     player1Board.appendChild(dragImage);
   };
@@ -283,6 +282,11 @@ export function createView() {
   const getActiveDragImageType = () =>
     document.querySelector('.drag-image.active').dataset.type;
 
+  const hideShipInsertionMarker = () => {
+    const marker = document.querySelector('#insertion-marker');
+    marker.style.visibility = 'hidden';
+  };
+
   // Binders below
   const bindClick = (handlers) => {
     gameboards.forEach((gameboard) => {
@@ -335,6 +339,7 @@ export function createView() {
     enableDraggableShipEvents,
     getActiveDragImageType,
     getShipDragImage,
+    hideShipInsertionMarker,
     init,
     moveShipInsertionMarker,
     placeShip,

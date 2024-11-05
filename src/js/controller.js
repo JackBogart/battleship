@@ -188,8 +188,7 @@ export function createController() {
         isVertical,
       );
     } else if (event.target.classList.contains('gameboard')) {
-      const temp = document.querySelector('#insertion-marker');
-      temp.style.visibility = 'hidden';
+      view.hideShipInsertionMarker();
     }
   };
 
