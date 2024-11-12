@@ -6,6 +6,47 @@
     <title>Battleship</title>
   </head>
   <body>
+    <dialog class="planning-modal">
+      <div class="gameboard"></div>
+      <div class="ships"></div>
+      <form action="" method="dialog">
+        <div class="form-row">
+          <label for="name">Player Name</label
+          ><input type="text" name="name" id="name" required />
+        </div>
+
+        <fieldset>
+          <legend>Game Mode</legend>
+          <div>
+            <input
+              type="radio"
+              name="game-mode"
+              id="computer"
+              value="computer"
+              checked
+              required
+            />
+            <label for="computer">Computer</label>
+          </div>
+
+          <div>
+            <input
+              type="radio"
+              name="game-mode"
+              id="player"
+              value="player"
+              disabled
+            />
+            <label for="player">Player</label>
+          </div>
+        </fieldset>
+
+        <div class="buttons">
+          <button type="button" class="btn randomize">Reroll Ships</button>
+          <button type="submit" class="submit-btn btn">Submit</button>
+        </div>
+      </form>
+    </dialog>
     <div class="header">Battleship</div>
     <div class="content">
       <div class="gameplay-section">
@@ -17,7 +58,6 @@
       </div>
       <div class="buttons">
         <button type="button" class="btn start-game">Start Game</button>
-        <button type="button" class="btn randomize">Reroll Ships</button>
       </div>
     </div>
     <div class="github-banner">

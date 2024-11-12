@@ -80,6 +80,10 @@ body {
   border: var(--grid-border-color) var(--grid-border-size) solid;
 }
 
+.content .gameboard {
+  display: none;
+}
+
 .current-status {
   font-size: 1.5rem;
   display: flex;
@@ -102,20 +106,52 @@ body {
 }
 
 .ship-container {
-  display: flex;
-  gap: var(--grid-border-size);
+  display: grid;
+  grid-auto-rows: var(--grid-cell-size);
+  grid-auto-columns: var(--grid-cell-size);
+  grid-auto-flow: column;
   background-color: var(--grid-border-color);
   cursor: grab;
+  gap: var(--grid-border-size);
+}
+
+.ship-container:not(.drag-image) {
+  outline: var(--grid-border-color) var(--grid-border-size) solid;
 }
 
 .ship-container.vertical {
-  flex-direction: column;
+  grid-auto-flow: row;
 }
 
 .ship-container > * {
   background-color: var(--ship-cell-color);
-  flex-grow: 1;
   pointer-events: none;
+}
+
+.drag-image {
+  outline: none;
+  background-color: var(--grid-border-color);
+  z-index: -2;
+}
+
+.drag-image.vertical > * {
+  border-left: var(--grid-border-color) var(--grid-border-size) solid;
+  border-right: var(--grid-border-color) var(--grid-border-size) solid;
+}
+
+.drag-image:not(.vertical) > * {
+  border-top: var(--grid-border-color) var(--grid-border-size) solid;
+  border-bottom: var(--grid-border-color) var(--grid-border-size) solid;
+}
+
+.drag-image > *:first-child {
+  border-top: var(--grid-border-color) var(--grid-border-size) solid;
+  border-left: var(--grid-border-color) var(--grid-border-size) solid;
+}
+
+.drag-image > *:last-child {
+  border-bottom: var(--grid-border-color) var(--grid-border-size) solid;
+  border-right: var(--grid-border-color) var(--grid-border-size) solid;
 }
 
 #insertion-marker > * {
@@ -124,12 +160,6 @@ body {
 
 #insertion-marker.invalid > * {
   background-color: var(--invalid-marker-color);
-}
-
-.drag-image {
-  border: var(--grid-border-color) var(--grid-border-size) solid;
-  background-color: hsla(0, 0%, 0%, 0.55);
-  z-index: -2;
 }
 
 .github-banner {
@@ -169,4 +199,58 @@ body {
 
 .btn:active {
   background: var(--primary-background-color-lightest);
+}
+
+.planning-modal[open] {
+  display: grid;
+  column-gap: 3rem;
+  row-gap: 1rem;
+  grid-template-rows: 3fr 1.9fr;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    'board ships'
+    'board form';
+  border-radius: 20px;
+  padding: 2rem 2rem;
+}
+
+.planning-modal > .gameboard {
+  grid-area: board;
+  align-self: center;
+}
+
+.planning-modal > form {
+  grid-area: form;
+}
+
+.ships {
+  grid-area: ships;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background-color: hsl(0, 0%, 94%);
+  border-radius: 20px;
+  box-shadow: inset 0px 0px 2px 1px #979ba0;
+  padding: 0.8rem;
+}
+
+input {
+  /* appearance: none; */
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+}
+
+fieldset {
+  display: flex;
+  flex-direction: column;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
 }

@@ -2,12 +2,9 @@
 
 ### Todo
 
-- Review drag and drop implementation
+- Add custom form validations
 - Implement two player mode
   - Adjust rendering to account for two player mode
-- Redesign the page layout. Currently it uses a very generic layout that I made
-  on a whim.
-  - Add ability to set name
 - Add dark mode
 - Options menu to change site theme color?
   - This isn't required at all but would be kinda cool
@@ -17,3 +14,11 @@
 - Clean up the README to show off the project
 - Look into why drag and drop API cursors aren't appearing without CSS
 - Re-examine the drag and drop system, should we remove and create or adjust?
+- Add feedback for failed rotation attempts, make the ship(s) preventing it blink
+  red?
+- Improve AI?
+- Refactor control/view logic
+  - Can probably abstract a lot of the view, exposing methods for each view
+    (view meaning stage of the game) as needed, and methods related to action
+    listeners.
+- Final UI review

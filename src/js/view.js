@@ -11,11 +11,15 @@ function createButton(className, text) {
 }
 
 export function createView() {
+  const planningModal = document.querySelector('.planning-modal');
+  const planningForm = document.querySelector('.planning-modal > form');
   const player1Board = document.querySelector('.player-1');
   const player2Board = document.querySelector('.player-2');
   const status = document.querySelector('.current-status');
   const gameboards = document.querySelectorAll('.gameboard');
-  const buttons = document.querySelector('.buttons');
+  const buttons = document.querySelector('.content .buttons');
+  const planningShips = document.querySelector('.ships');
+  const planningBoard = document.querySelector('.planning-modal > .gameboard');
 
   const init = () => {
     gameboards.forEach((grid) => {
@@ -98,7 +102,7 @@ export function createView() {
     );
   };
 
-  const resetBoards = () => {
+  const resetPlayerBoards = () => {
     status.textContent = ``;
     const playerBoards = [player1Board, player2Board];
 
@@ -113,6 +117,12 @@ export function createView() {
         });
       }
     }
+    player1Board.style.display = 'none';
+    player2Board.style.display = 'none';
+  };
+
+  const showPlanningModal = () => {
+    planningModal.showModal();
   };
 
   const reportGameOver = (name) => {
@@ -122,22 +132,29 @@ export function createView() {
     buttons.appendChild(playAgainBtn);
   };
 
-  const addPreGameControls = () => {
-    const startGameBtn = createButton('start-game', 'Start Game');
-    const randomizeBtn = createButton('randomize', 'Reroll Ships');
-    buttons.replaceChildren(startGameBtn, randomizeBtn);
-  };
-
   const removePreGameControls = () => {
     buttons.replaceChildren();
   };
 
-  const createShipDragImage = (shipElement) => {
-    const dragImage = shipElement.cloneNode(true);
+  const styleShipSize = (shipElement, row, col, isVertical, length) => {
+    if (isVertical) {
+      shipElement.classList.add('vertical');
+      shipElement.style.gridRow = `${row + 1} / span ${length}`;
+      shipElement.style.gridColumn = `${col + 1} / span 1`;
+    } else {
+      shipElement.classList.remove('vertical');
+      shipElement.style.gridRow = `${row + 1} / span 1`;
+      shipElement.style.gridColumn = `${col + 1} / span ${length}`;
+    }
+  };
 
+  const createShipDragImage = (shipElement, isVertical, length) => {
+    const dragImage = shipElement.cloneNode(true);
     dragImage.classList.add('drag-image');
 
-    player1Board.appendChild(dragImage);
+    styleShipSize(dragImage, 0, 0, isVertical, length);
+
+    planningBoard.appendChild(dragImage);
   };
 
   const getShipDragImage = (shipType) =>
@@ -148,53 +165,32 @@ export function createView() {
     dragImage.remove();
   };
 
-  // TODO: Need to refactor, ship shouldn't be created onto the board
-  const createShip = (row, col, isVertical, ship, isPlayer1) => {
-    const board = isPlayer1 ? player1Board : player2Board;
+  const createShip = (ship) => {
     const shipContainer = document.createElement('div');
     shipContainer.dataset.type = `${ship.getType()}`;
     shipContainer.classList.add('ship-container');
     shipContainer.draggable = true;
 
-    if (isVertical) {
-      shipContainer.style.gridRow = `${row + 1} / ${row + ship.getLength() + 1}`;
-      shipContainer.style.gridColumn = `${col + 1} / ${col + 2}`;
-      shipContainer.classList.add('vertical');
-    } else {
-      shipContainer.style.gridRow = `${row + 1} / ${row + 2}`;
-      shipContainer.style.gridColumn = `${col + 1} / ${col + ship.getLength() + 1}`;
-    }
-
     for (let i = 0; i < ship.getLength(); i++) {
       shipContainer.appendChild(document.createElement('div'));
     }
 
-    board.appendChild(shipContainer);
-    createShipDragImage(shipContainer);
+    planningShips.appendChild(shipContainer);
+    createShipDragImage(shipContainer, false, ship.getLength());
   };
 
-  const placeShip = (row, col, isVertical, ship, isPlayer1) => {
-    const board = isPlayer1 ? player1Board : player2Board;
-    const shipSelector = `.ship-container[data-type="${ship.getType()}"]`;
+  const placeShip = (row, col, isVertical, ship) => {
+    const shipSelector = `.ship-container[data-type="${ship.getType()}"]:not(.drag-image):not(#insertion-marker)`;
     const shipElement = document.querySelector(shipSelector);
 
     // When the ship isn't placed on the board yet, (first placement)
-    if (board.querySelector(shipSelector) === null) {
-      board.appendChild(shipElement);
+    if (planningBoard.querySelector(shipSelector) === null) {
+      planningBoard.appendChild(shipElement);
     }
 
-    if (isVertical) {
-      shipElement.classList.add('vertical');
-      shipElement.style.gridRow = `${row + 1} / ${row + ship.getLength() + 1}`;
-      shipElement.style.gridColumn = `${col + 1} / ${col + 2}`;
-    } else {
-      shipElement.classList.remove('vertical');
-      shipElement.style.gridRow = `${row + 1} / ${row + 2}`;
-      shipElement.style.gridColumn = `${col + 1} / ${col + ship.getLength() + 1}`;
-    }
-
+    styleShipSize(shipElement, row, col, isVertical, ship.getLength());
     removeShipDragImage(ship.getType());
-    createShipDragImage(shipElement);
+    createShipDragImage(shipElement, isVertical, ship.getLength());
   };
 
   const removeDraggableShips = () => {
@@ -207,8 +203,9 @@ export function createView() {
     const marker = shipElement.cloneNode(true);
     marker.style.opacity = '1';
     marker.id = 'insertion-marker';
+    marker.style.display = 'none';
 
-    player1Board.appendChild(marker);
+    planningBoard.appendChild(marker);
   };
 
   const removeShipInsertionMarker = () => {
@@ -232,7 +229,7 @@ export function createView() {
 
   const moveShipInsertionMarker = (row, col, isValid, length, isVertical) => {
     const marker = document.querySelector('#insertion-marker');
-    marker.style.visibility = 'visible';
+    marker.style.display = '';
 
     const computedStyle = window.getComputedStyle(marker);
     const currentRowStart = Number(computedStyle.gridRowStart);
@@ -278,17 +275,50 @@ export function createView() {
   const activateDragImage = (element) => {
     element.classList.add('active');
   };
+  const deactivateDragImage = () => {
+    const dragImage = document.querySelector('.drag-image.active');
+    if (dragImage !== null) {
+      dragImage.classList.remove('active');
+    }
+  };
 
   const getActiveDragImageType = () =>
     document.querySelector('.drag-image.active').dataset.type;
 
   const hideShipInsertionMarker = () => {
     const marker = document.querySelector('#insertion-marker');
-    marker.style.visibility = 'hidden';
+    marker.style.display = 'none';
+  };
+
+  const returnShip = (ship) => {
+    const shipSelector = `.ship-container[data-type="${ship.getType()}"]:not(.drag-image):not(#insertion-marker)`;
+    const shipElement = document.querySelector(shipSelector);
+
+    // When the ship isn't placed on the board yet, (first placement)
+    if (planningShips.querySelector(shipSelector) === null) {
+      planningShips.appendChild(shipElement);
+    }
+
+    shipElement.classList.remove('vertical');
+    shipElement.style.gridArea = '';
+
+    removeShipDragImage(ship.getType());
+    createShipDragImage(shipElement, false, ship.getLength());
+  };
+
+  const getPlanningFormData = () => ({
+    name: planningForm.name.value,
+    opponent: planningForm['game-mode'].value,
+  });
+
+  const hidePlanningModal = () => {
+    planningModal.close();
+    player1Board.style.display = 'grid';
+    player2Board.style.display = 'grid';
   };
 
   // Binders below
-  const bindClick = (handlers) => {
+  const bindGameboard = (handlers) => {
     gameboards.forEach((gameboard) => {
       gameboard.addEventListener('click', (event) => {
         if (event.target.classList.contains('grid-cell')) {
@@ -306,39 +336,54 @@ export function createView() {
 
   const bindButtons = (handlers) => {
     buttons.addEventListener('click', (event) => {
-      if (event.target.classList.contains('randomize')) {
-        handlers.randomize();
-      } else if (event.target.classList.contains('start-game')) {
+      if (event.target.classList.contains('start-game')) {
         handlers.start();
       } else if (event.target.classList.contains('play-again')) {
-        handlers.playAgain();
+        handlers.start();
       }
     });
   };
 
   const bindDragAndDrop = (handlers) => {
-    player1Board.addEventListener('dragstart', handlers.dragStart);
+    // Ships
+    planningShips.addEventListener('dragstart', handlers.dragStart);
+    planningShips.addEventListener('dragend', handlers.dragEnd);
+    planningShips.addEventListener('dragover', handlers.dragOver);
+    planningShips.addEventListener('drop', handlers.drop);
 
-    player1Board.addEventListener('dragend', handlers.dragEnd);
+    // Planning Board
+    planningBoard.addEventListener('dragstart', handlers.dragStart);
+    planningBoard.addEventListener('dragend', handlers.dragEnd);
+    planningBoard.addEventListener('dragover', handlers.dragOver);
+    planningBoard.addEventListener('drop', handlers.drop);
+    planningBoard.addEventListener('dragleave', handlers.leave);
+  };
 
-    player1Board.addEventListener('dragover', handlers.dragOver);
-
-    player1Board.addEventListener('drop', handlers.drop);
+  const bindModalButtons = (handlers) => {
+    planningModal.addEventListener('submit', handlers.submit);
+    planningModal.addEventListener('click', (event) => {
+      if (event.target.classList.contains('randomize')) {
+        handlers.randomize();
+      }
+    });
   };
 
   return {
-    addPreGameControls,
     activateDragImage,
     bindButtons,
-    bindClick,
     bindDragAndDrop,
+    bindGameboard,
+    bindModalButtons,
     createShipDragImage,
     createShipInsertionMarker,
     createShip,
+    deactivateDragImage,
     disableDraggableShipEvents,
     enableDraggableShipEvents,
     getActiveDragImageType,
+    getPlanningFormData,
     getShipDragImage,
+    hidePlanningModal,
     hideShipInsertionMarker,
     init,
     moveShipInsertionMarker,
@@ -352,21 +397,21 @@ export function createView() {
     renderAllSunkenShips,
     renderSunkenShip,
     reportGameOver,
-    resetBoards,
+    resetPlayerBoards,
+    returnShip,
+    showPlanningModal,
   };
 }
 
 export function getXYOffsets(ship) {
-  // Divide main axis by x2 number of nodes to get center of the first node
-  if (ship.classList.contains('vertical')) {
-    return {
-      offsetX: Number(ship.offsetWidth) / 2,
-      offsetY: Number(ship.offsetHeight) / (Number(ship.childElementCount) * 2),
-    };
-  }
+  const isVertical = ship.classList.contains('vertical');
+
+  // Divide main axis by 2 x number of nodes to get center of the first cell
+  const xDenominator = isVertical ? 2 : Number(ship.childElementCount) * 2;
+  const yDenominator = !isVertical ? 2 : Number(ship.childElementCount) * 2;
 
   return {
-    offsetX: Number(ship.offsetWidth) / (Number(ship.childElementCount) * 2),
-    offsetY: Number(ship.offsetHeight) / 2,
+    offsetX: Number(ship.offsetWidth) / xDenominator,
+    offsetY: Number(ship.offsetHeight) / yDenominator,
   };
 }

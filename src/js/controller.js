@@ -66,10 +66,7 @@ export function createController() {
     }
 
     player.setShip(ship, row, col, isVertical);
-    if (player.getName() === 'Player') {
-      // For placement system, temporary will need to do this in a better way
-      view.createShip(row, col, isVertical, ship, true);
-    }
+    view.placeShip(row, col, isVertical, ship);
   };
 
   const randomizeBoard = (player) => {
@@ -115,26 +112,21 @@ export function createController() {
 
   const handleRandomizeShips = () => {
     player1.removeAllShips();
-    view.removeDraggableShips();
     randomizeBoard(player1);
   };
 
   const handleStartGame = () => {
-    isGameInProgress = true;
-    view.removePreGameControls();
-    view.removeDraggableShips();
-    view.renderAllPlayerShips(true, player1);
-  };
-
-  const handlePlayAgain = () => {
-    view.resetBoards();
+    view.createShip(createShip(ShipType.CARRIER));
+    view.createShip(createShip(ShipType.BATTLESHIP));
+    view.createShip(createShip(ShipType.DESTROYER));
+    view.createShip(createShip(ShipType.SUBMARINE));
+    view.createShip(createShip(ShipType.PATROL_BOAT));
+    view.resetPlayerBoards();
+    view.showPlanningModal();
     player1 = createPlayer('Player', PlayerType.HUMAN);
     player2 = createComputerPlayer();
     isGameInProgress = false;
     isPlayer1Turn = true;
-    randomizeBoard(player1);
-    randomizeBoard(player2);
-    view.addPreGameControls();
   };
 
   const dragstartHandler = (event) => {
@@ -164,20 +156,30 @@ export function createController() {
     if (event.target.classList.contains('ship-container')) {
       view.enableDraggableShipEvents();
       view.removeShipInsertionMarker();
+      view.deactivateDragImage();
     }
   };
 
   const dragoverHandler = (event) => {
+    event.preventDefault();
+
     if (event.target.classList.contains('grid-cell')) {
-      event.preventDefault();
       event.dataTransfer.dropEffect = 'move';
 
       const player = isPlayer1Turn ? player1 : player2;
       const newRow = Number(event.target.dataset.row);
       const newCol = Number(event.target.dataset.col);
       const shipType = view.getActiveDragImageType();
-      const { row, col, isVertical } = player.getInitialPosition(shipType);
-      const ship = player.getShip(row, col);
+      const positionData = player.getInitialPosition(shipType);
+      let ship, isVertical;
+
+      if (positionData === undefined) {
+        ship = createShip(shipType);
+        isVertical = false;
+      } else {
+        ship = player.getShip(positionData.row, positionData.col);
+        isVertical = positionData.isVertical;
+      }
       const isValid = player.isValidPlacement(ship, newRow, newCol, isVertical);
 
       view.moveShipInsertionMarker(
@@ -187,26 +189,53 @@ export function createController() {
         ship.getLength(),
         isVertical,
       );
-    } else if (event.target.classList.contains('gameboard')) {
+    } else {
       view.hideShipInsertionMarker();
     }
   };
 
+  const dragleaveHandler = () => {
+    view.hideShipInsertionMarker();
+  };
+
   const dropHandler = (event) => {
-    if (event.dataTransfer.getData('text/plain') !== '') {
-      event.preventDefault();
-      const player = isPlayer1Turn ? player1 : player2;
+    if (event.dataTransfer.getData('text/plain') === '') {
+      return;
+    }
+
+    event.preventDefault();
+    const shipType = event.dataTransfer.getData('text/plain');
+    const player = isPlayer1Turn ? player1 : player2;
+    const positionData = player.getInitialPosition(shipType);
+
+    if (event.target.classList.contains('grid-cell')) {
       const newRow = Number(event.target.dataset.row);
       const newCol = Number(event.target.dataset.col);
-      const shipType = event.dataTransfer.getData('text/plain');
-      const { row, col, isVertical } = player.getInitialPosition(shipType);
-      const ship = player.getShip(row, col);
+      let ship, isVertical;
+
+      // If new ship, else move existing ship
+      if (positionData === undefined) {
+        ship = createShip(shipType);
+        isVertical = false;
+      } else {
+        ship = player.getShip(positionData.row, positionData.col);
+        isVertical = positionData.isVertical;
+      }
 
       if (player.isValidPlacement(ship, newRow, newCol, isVertical)) {
-        player.removeShip(row, col);
+        if (positionData !== undefined) {
+          player.removeShip(positionData.row, positionData.col);
+        }
         player.setShip(ship, newRow, newCol, isVertical);
-        view.placeShip(newRow, newCol, isVertical, ship, isPlayer1Turn);
+        view.placeShip(newRow, newCol, isVertical, ship);
       }
+    } else if (
+      event.target.classList.contains('ships') &&
+      positionData !== undefined
+    ) {
+      const ship = createShip(shipType);
+      player.removeShip(positionData.row, positionData.col);
+      view.returnShip(ship);
     }
   };
 
@@ -218,29 +247,44 @@ export function createController() {
     if (player.isValidPlacement(ship, row, col, !isVertical)) {
       player.removeShip(row, col);
       player.setShip(ship, row, col, !isVertical);
-      view.placeShip(row, col, !isVertical, ship, isPlayer1Turn);
+      view.placeShip(row, col, !isVertical, ship);
+    }
+  };
+
+  const submitHandler = (event) => {
+    const { name, opponent } = view.getPlanningFormData();
+    event.target.closest('dialog').close();
+    player1.setName(name);
+    if (opponent === 'computer') {
+      randomizeBoard(player2);
+      isGameInProgress = true;
+      view.removePreGameControls();
+      view.removeDraggableShips();
+      view.hidePlanningModal();
+      view.renderAllPlayerShips(true, player1);
     }
   };
 
   const run = () => {
     view.init();
-    view.bindClick({
+    view.bindGameboard({
       receiveAttack: receiveAttackHandler,
       rotate: rotateShipHandler,
     });
     view.bindButtons({
-      randomize: handleRandomizeShips,
       start: handleStartGame,
-      playAgain: handlePlayAgain,
     });
     view.bindDragAndDrop({
       dragStart: dragstartHandler,
       dragEnd: dragendHandler,
       dragOver: dragoverHandler,
       drop: dropHandler,
+      leave: dragleaveHandler,
     });
-    randomizeBoard(player1);
-    randomizeBoard(player2);
+    view.bindModalButtons({
+      randomize: handleRandomizeShips,
+      submit: submitHandler,
+    });
   };
 
   return { run };
