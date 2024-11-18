@@ -1,6 +1,6 @@
 import { createComputerPlayer, createPlayer } from './model/player';
 import { createShip } from './model/ship';
-import { PlayerType, ShipType, TileInfoType } from './types';
+import { FormFieldType, PlayerType, ShipType, TileInfoType } from './types';
 import { getRandomInt } from './utils/random';
 import { createView, getXYOffsets } from './view';
 
@@ -111,11 +111,17 @@ export function createController() {
   };
 
   const handleRandomizeShips = () => {
-    player1.removeAllShips();
-    randomizeBoard(player1);
+    const player = isPlayer1Turn ? player1 : player2;
+    player.removeAllShips();
+    randomizeBoard(player);
+
+    if (view.isFieldMarkedInvalid(FormFieldType.SHIPS)) {
+      view.removeFormErrors(FormFieldType.SHIPS);
+    }
   };
 
   const handleStartGame = () => {
+    view.removeDraggableShips();
     view.createShip(createShip(ShipType.CARRIER));
     view.createShip(createShip(ShipType.BATTLESHIP));
     view.createShip(createShip(ShipType.DESTROYER));
@@ -228,9 +234,16 @@ export function createController() {
         }
         player.setShip(ship, newRow, newCol, isVertical);
         view.placeShip(newRow, newCol, isVertical, ship);
+
+        if (
+          player.getAllShips().length === 5 &&
+          view.isFieldMarkedInvalid(FormFieldType.SHIPS)
+        ) {
+          view.removeFormErrors(FormFieldType.SHIPS);
+        }
       }
     } else if (
-      event.target.classList.contains('ships') &&
+      event.target.id === FormFieldType.SHIPS &&
       positionData !== undefined
     ) {
       const ship = createShip(shipType);
@@ -251,17 +264,37 @@ export function createController() {
     }
   };
 
-  const submitHandler = (event) => {
-    const { name, opponent } = view.getPlanningFormData();
-    event.target.closest('dialog').close();
-    player1.setName(name);
-    if (opponent === 'computer') {
-      randomizeBoard(player2);
-      isGameInProgress = true;
-      view.removePreGameControls();
-      view.removeDraggableShips();
-      view.hidePlanningModal();
-      view.renderAllPlayerShips(true, player1);
+  const submitHandler = (event, data) => {
+    const player = isPlayer1Turn ? player1 : player2;
+    const { name, opponent } = data;
+
+    if (view.isFormValid() && player.getAllShips().length === 5) {
+      player.setName(name);
+      if (opponent === 'computer') {
+        randomizeBoard(player2);
+        isGameInProgress = true;
+        view.removePreGameControls();
+        view.showGameplayBoards();
+        view.resetFormFields();
+        view.renderAllPlayerShips(true, player1);
+      } else {
+        // TODO: Handle 2 player
+      }
+    } else {
+      view.showFormErrors(player.getAllShips().length !== 5);
+      event.preventDefault();
+    }
+  };
+
+  const nameInputHandler = () => {
+    if (view.isFieldMarkedInvalid(FormFieldType.NAME)) {
+      view.removeFormErrors(FormFieldType.NAME);
+    }
+  };
+
+  const opponentInputHandler = () => {
+    if (view.isFieldMarkedInvalid(FormFieldType.OPPONENT)) {
+      view.removeFormErrors(FormFieldType.OPPONENT);
     }
   };
 
@@ -285,6 +318,8 @@ export function createController() {
       randomize: handleRandomizeShips,
       submit: submitHandler,
     });
+    view.bindName(nameInputHandler);
+    view.bindOpponent(opponentInputHandler);
   };
 
   return { run };

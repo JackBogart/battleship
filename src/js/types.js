@@ -16,3 +16,9 @@ export const TileInfoType = Object.freeze({
   MISSED: Symbol('missed'),
   HIT: Symbol('hit'),
 });
+
+export const FormFieldType = Object.freeze({
+  SHIPS: 'planning-ships',
+  NAME: 'name',
+  OPPONENT: 'opponent',
+});

@@ -8,41 +8,49 @@
   <body>
     <dialog class="planning-modal">
       <div class="gameboard"></div>
-      <div class="ships"></div>
-      <form action="" method="dialog">
-        <div class="form-row">
-          <label for="name">Player Name</label
-          ><input type="text" name="name" id="name" required />
+      <div class="ship-wrapper">
+        <div id="planning-ships"></div>
+        <span class="error" aria-live="polite"></span>
+      </div>
+      <form action="" method="dialog" novalidate>
+        <div class="form-inputs">
+          <div class="form-row">
+            <label for="name">Name</label
+            ><input type="text" name="name" id="name" required />
+            <span class="error" aria-live="polite"></span>
+          </div>
+
+          <div class="form-row">
+            <fieldset id="opponent">
+              <legend>Opponent</legend>
+              <div class="radio-control">
+                <input
+                  type="radio"
+                  name="opponent"
+                  id="computer"
+                  value="computer"
+                  checked
+                  required
+                />
+                <label for="computer">Computer</label>
+              </div>
+
+              <div class="radio-control">
+                <input
+                  type="radio"
+                  name="opponent"
+                  id="player"
+                  value="player"
+                />
+                <label for="player">Player</label>
+              </div>
+            </fieldset>
+            <span class="error" aria-live="polite"></span>
+          </div>
         </div>
 
-        <fieldset>
-          <legend>Game Mode</legend>
-          <div>
-            <input
-              type="radio"
-              name="game-mode"
-              id="computer"
-              value="computer"
-              checked
-              required
-            />
-            <label for="computer">Computer</label>
-          </div>
-
-          <div>
-            <input
-              type="radio"
-              name="game-mode"
-              id="player"
-              value="player"
-              disabled
-            />
-            <label for="player">Player</label>
-          </div>
-        </fieldset>
-
         <div class="buttons">
-          <button type="button" class="btn randomize">Reroll Ships</button>
+          <button type="button" class="btn randomize">Randomize</button>
           <button type="submit" class="submit-btn btn">Submit</button>
         </div>
       </form>

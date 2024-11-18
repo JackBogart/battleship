@@ -110,7 +110,14 @@ export function createGameboard() {
     shipData = {};
   };
 
+  const getAllShips = () =>
+    Object.values(shipData).reduce((ships, data) => {
+      ships.push(data.ship);
+      return ships;
+    }, []);
+
   return {
+    getAllShips,
     getShip,
     setShip,
     getInfoBoard,

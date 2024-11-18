@@ -1,5 +1,5 @@
 import { NUM_OF_COLUMNS, NUM_OF_ROWS } from './constants';
-import { TileInfoType } from './types';
+import { FormFieldType, TileInfoType } from './types';
 
 function createButton(className, text) {
   const button = document.createElement('button');
@@ -18,8 +18,8 @@ export function createView() {
   const status = document.querySelector('.current-status');
   const gameboards = document.querySelectorAll('.gameboard');
   const buttons = document.querySelector('.content .buttons');
-  const planningShips = document.querySelector('.ships');
-  const planningBoard = document.querySelector('.planning-modal > .gameboard');
+  const planningShips = document.querySelector(`#${FormFieldType.SHIPS}`);
+  const planningBoard = document.querySelector(`.planning-modal .gameboard`);
 
   const init = () => {
     gameboards.forEach((grid) => {
@@ -259,15 +259,13 @@ export function createView() {
   };
 
   const disableDraggableShipEvents = () => {
-    const ships = document.querySelectorAll('.ship-container');
-    ships.forEach((ship) => {
+    document.querySelectorAll('.ship-container').forEach((ship) => {
       ship.style.pointerEvents = 'none';
     });
   };
 
   const enableDraggableShipEvents = () => {
-    const ships = document.querySelectorAll('.ship-container');
-    ships.forEach((ship) => {
+    document.querySelectorAll('.ship-container').forEach((ship) => {
       ship.style.pointerEvents = 'auto';
     });
   };
@@ -306,15 +304,44 @@ export function createView() {
     createShipDragImage(shipElement, false, ship.getLength());
   };
 
-  const getPlanningFormData = () => ({
-    name: planningForm.name.value,
-    opponent: planningForm['game-mode'].value,
-  });
-
-  const hidePlanningModal = () => {
-    planningModal.close();
+  const showGameplayBoards = () => {
     player1Board.style.display = 'grid';
     player2Board.style.display = 'grid';
+  };
+
+  const resetFormFields = () => {
+    planningForm.name.value = '';
+    document.querySelector('#computer').checked = true;
+  };
+
+  const removeFormErrors = (formFieldType) => {
+    document.querySelector(`#${formFieldType}`).classList.remove('invalid');
+    document.querySelector(`#${formFieldType} + .error`).textContent = '';
+  };
+
+  const isFormValid = () =>
+    planningForm.name.validity.valid && planningForm.opponent.value !== '';
+
+  const isFieldMarkedInvalid = (formFieldType) =>
+    document.querySelector(`#${formFieldType} + .error`).textContent !== '';
+
+  const showFormErrors = (isShipsInvalid) => {
+    if (planningForm.name.validity.valueMissing) {
+      planningForm.name.classList.add('invalid');
+      document.querySelector('#name + .error').textContent =
+        'Please fill in required field.';
+    }
+
+    if (planningForm.opponent.value === '') {
+      document.querySelector('fieldset + .error').textContent =
+        'Please fill in required field.';
+    }
+
+    if (isShipsInvalid) {
+      planningShips.classList.add('invalid');
+      document.querySelector('#planning-ships + .error').textContent =
+        'Please place all ships onto the board.';
+    }
   };
 
   // Binders below
@@ -360,7 +387,12 @@ export function createView() {
   };
 
   const bindModalButtons = (handlers) => {
-    planningModal.addEventListener('submit', handlers.submit);
+    planningModal.addEventListener('submit', (event) => {
+      handlers.submit(event, {
+        name: planningForm.name.value,
+        opponent: planningForm.opponent.value,
+      });
+    });
     planningModal.addEventListener('click', (event) => {
       if (event.target.classList.contains('randomize')) {
         handlers.randomize();
@@ -368,11 +400,27 @@ export function createView() {
     });
   };
 
+  const bindName = (handler) => {
+    document
+      .querySelector(`#${FormFieldType.NAME}`)
+      .addEventListener('input', handler);
+  };
+
+  const bindOpponent = (handler) => {
+    document
+      .querySelector(`#${FormFieldType.OPPONENT}`)
+      .addEventListener('change', handler);
+  };
+
   return {
     activateDragImage,
     bindButtons,
     bindDragAndDrop,
     bindGameboard,
+    bindName,
+    bindOpponent,
+    removeFormErrors,
+    isFieldMarkedInvalid,
     bindModalButtons,
     createShipDragImage,
     createShipInsertionMarker,
@@ -381,13 +429,14 @@ export function createView() {
     disableDraggableShipEvents,
     enableDraggableShipEvents,
     getActiveDragImageType,
-    getPlanningFormData,
     getShipDragImage,
-    hidePlanningModal,
+    showGameplayBoards,
     hideShipInsertionMarker,
     init,
     moveShipInsertionMarker,
     placeShip,
+    showFormErrors,
+    isFormValid,
     receiveAttack,
     removeDraggableShips,
     removeShipDragImage,
@@ -396,6 +445,7 @@ export function createView() {
     renderAllPlayerShips,
     renderAllSunkenShips,
     renderSunkenShip,
+    resetFormFields,
     reportGameOver,
     resetPlayerBoards,
     returnShip,

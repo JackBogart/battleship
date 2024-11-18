@@ -48,7 +48,10 @@ export function createPlayer(name, playerType) {
     gameboard.removeShip(row, col);
   };
 
+  const getAllShips = () => gameboard.getAllShips();
+
   return {
+    getAllShips,
     getName,
     getType,
     setName,

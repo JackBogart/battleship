@@ -248,3 +248,20 @@ describe('removeAllShips', () => {
     expect(gameboard.getInitialPosition('electric boogaloo 2')).toBeUndefined();
   });
 });
+
+describe('getAllShips', () => {
+  it('should get all ships from the gameboard', () => {
+    const ship1 = createShip('electric boogaloo');
+    const ship2 = createShip('electric boogaloo 2');
+    ship1.getLength.mockReturnValue(2);
+    ship2.getLength.mockReturnValue(3);
+    gameboard.setShip(ship1, 2, 1, true);
+    gameboard.setShip(ship2, 5, 7, false);
+
+    const ships = gameboard.getAllShips();
+
+    expect(ships.length).toBe(2);
+    expect(ships[0].getType()).toBe('electric boogaloo');
+    expect(ships[1].getType()).toBe('electric boogaloo 2');
+  });
+});
