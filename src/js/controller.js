@@ -6,8 +6,7 @@ import { createView, getXYOffsets } from './view';
 
 export function createController() {
   const view = createView();
-  let player1 = createPlayer('Player', PlayerType.HUMAN);
-  let player2 = createComputerPlayer();
+  let player1, player2;
   let isGameInProgress = false;
   let isPlayer1Turn = true;
 
@@ -100,12 +99,21 @@ export function createController() {
     if (attackedPlayer.getTileInfo(row, col) === TileInfoType.UNKNOWN) {
       playerTurn(attackedPlayer, row, col);
 
-      if (isGameInProgress && isPlayer2Computer) {
+      if (!isGameInProgress) {
+        return;
+      }
+
+      if (isPlayer2Computer) {
         const [computerRow, computerCol] = player2.getComputerAttack(
           player1.getInfoBoard(),
         );
         player2.updateLastAttack(computerRow, computerCol);
         playerTurn(player1, computerRow, computerCol);
+      } else {
+        const attackingPlayer = !isPlayer1Turn ? player1 : player2;
+        view.hideAllPlayerShips(!isPlayer1Turn, attackingPlayer);
+        isGameInProgress = false;
+        view.enableReadyButton(attackedPlayer.getName());
       }
     }
   };
@@ -121,6 +129,7 @@ export function createController() {
   };
 
   const handleStartGame = () => {
+    view.resetFormFields();
     view.removeDraggableShips();
     view.createShip(createShip(ShipType.CARRIER));
     view.createShip(createShip(ShipType.BATTLESHIP));
@@ -130,8 +139,7 @@ export function createController() {
     view.resetPlayerBoards();
     view.showPlanningModal();
     player1 = createPlayer('Player', PlayerType.HUMAN);
-    player2 = createComputerPlayer();
-    isGameInProgress = false;
+    player2 = undefined;
     isPlayer1Turn = true;
   };
 
@@ -271,14 +279,33 @@ export function createController() {
     if (view.isFormValid() && player.getAllShips().length === 5) {
       player.setName(name);
       if (opponent === 'computer') {
+        player2 = createComputerPlayer();
         randomizeBoard(player2);
         isGameInProgress = true;
         view.removePreGameControls();
         view.showGameplayBoards();
         view.resetFormFields();
         view.renderAllPlayerShips(true, player1);
+      } else if (player2 === undefined) {
+        isPlayer1Turn = !isPlayer1Turn;
+        player2 = createPlayer('Player', PlayerType.HUMAN);
+        view.resetFormFields();
+        view.removeDraggableShips();
+        view.disableOpponentField();
+        view.createShip(createShip(ShipType.CARRIER));
+        view.createShip(createShip(ShipType.BATTLESHIP));
+        view.createShip(createShip(ShipType.DESTROYER));
+        view.createShip(createShip(ShipType.SUBMARINE));
+        view.createShip(createShip(ShipType.PATROL_BOAT));
+        event.preventDefault();
       } else {
-        // TODO: Handle 2 player
+        isPlayer1Turn = !isPlayer1Turn;
+        view.removePreGameControls();
+        view.showGameplayBoards();
+        view.resetFormFields();
+        view.removeDraggableShips();
+        view.showReadyButton();
+        view.enableReadyButton(player1.getName());
       }
     } else {
       view.showFormErrors(player.getAllShips().length !== 5);
@@ -298,6 +325,14 @@ export function createController() {
     }
   };
 
+  const readyHandler = () => {
+    const player = isPlayer1Turn ? player1 : player2;
+    view.renderAllPlayerShips(isPlayer1Turn, player);
+    view.renderAllSunkenShips(isPlayer1Turn, player);
+    isGameInProgress = true;
+    view.disableReadyButton(player.getName());
+  };
+
   const run = () => {
     view.init();
     view.bindGameboard({
@@ -306,6 +341,7 @@ export function createController() {
     });
     view.bindButtons({
       start: handleStartGame,
+      ready: readyHandler,
     });
     view.bindDragAndDrop({
       dragStart: dragstartHandler,

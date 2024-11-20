@@ -30,7 +30,7 @@ export default [
       'no-eval': 'error',
       'no-extend-native': 'error',
       'no-extra-bind': 'error',
-      'no-implicit-coercion': 'error',
+      'no-implicit-coercion': ['error', { boolean: false }],
       'no-inline-comments': 'error',
       'no-invalid-this': 'error',
       'no-iterator': 'error',

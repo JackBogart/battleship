@@ -2,9 +2,8 @@
 
 ### Todo
 
-- Implement two player mode
-  - Adjust rendering to account for two player mode
-- Add dark mode
+- Add player names under respective boards
+  - Do this for both modes
 - Refactor control/view logic
   - Can probably abstract a lot of the view, exposing methods for each view
     (view meaning stage of the game) as needed, and methods related to action
@@ -13,6 +12,7 @@
     their position?
   - Can also standardize how event delegation is handler. We shouldn't have
     logic sometimes in the view, and sometimes in the controller
+- Add dark mode
 - Final UI review
 - Clean up the README to show off the project
 

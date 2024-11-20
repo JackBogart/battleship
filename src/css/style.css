@@ -31,6 +31,12 @@
     var(--primary-saturation),
     calc(var(--primary-luminance) + 10%)
   );
+  --primary-background-color-disabled: hsla(
+    var(--primary-hue),
+    calc(var(--primary-saturation)),
+    calc(var(--primary-luminance)),
+    0.6
+  );
   --grid-cell-size: 2.5rem;
   --grid-border-size: 0.125rem;
   --grid-border-color: hsl(0, 0%, 12%);
@@ -187,22 +193,26 @@ body {
   align-self: center;
 }
 
-.btn {
+button {
   appearance: none;
   border: none;
   padding: 1rem 1rem;
   border-radius: 12px;
   background: var(--primary-background-color);
   color: white;
-  box-shadow: 1px 1px 2px 1px var(--form-control-accent-color);
+  box-shadow: 0px 1px 2px 0px var(--form-control-accent-color);
 }
 
-.btn:hover {
+button:hover {
   background: var(--primary-background-color-light);
 }
 
-.btn:active {
+button:active {
   background: var(--primary-background-color-lightest);
+}
+
+button:disabled {
+  background: var(--primary-background-color-disabled);
 }
 
 .planning-modal[open] {
@@ -237,7 +247,6 @@ body {
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
   align-items: flex-start;
   gap: 0.5rem;
   border-radius: 15px;
@@ -338,4 +347,8 @@ fieldset + .error {
 .form-inputs {
   display: flex;
   gap: 1rem;
+}
+
+input:disabled {
+  opacity: 0.5;
 }
