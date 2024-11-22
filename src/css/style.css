@@ -15,6 +15,8 @@
   --primary-hue: 229;
   --primary-saturation: 78%;
   --primary-luminance: 34%;
+  --secondary-background-color: hsl(0, 0%, 94%);
+  --secondary-background-color-light: hsl(0, 0%, 98%);
 
   --primary-background-color: hsl(
     var(--primary-hue),
@@ -53,6 +55,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  background-color: var(--secondary-background-color);
 }
 
 .header {
@@ -71,13 +74,35 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 0.5rem;
 }
 
-.gameboards {
+.gameplay-wrapper {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  column-gap: 2rem;
+}
+
+.gameplay-wrapper.active {
+  background-color: var(--secondary-background-color-light);
+  border-radius: 15px;
+  padding: 2rem;
+}
+
+.gameboard-wrapper {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 5rem;
+  gap: 1rem;
+}
+
+.player-name {
+  display: none;
+  font-size: 1.2rem;
+}
+
+.gameplay-wrapper.active .player-name {
+  display: block;
 }
 
 .gameboard {
@@ -184,11 +209,6 @@ body {
   fill: hsl(0, 0%, 50%);
 }
 
-.gameplay-section {
-  display: flex;
-  flex-direction: column;
-}
-
 .randomize {
   align-self: center;
 }
@@ -215,6 +235,13 @@ button:disabled {
   background: var(--primary-background-color-disabled);
 }
 
+.content .buttons {
+  place-self: end center;
+  min-width: 7rem;
+  display: flex;
+  justify-content: center;
+}
+
 .planning-modal[open] {
   display: grid;
   column-gap: 3rem;
@@ -231,10 +258,6 @@ button:disabled {
 .planning-modal > .gameboard {
   grid-area: board;
   place-self: center;
-}
-
-.planning-modal > form {
-  grid-area: form;
 }
 
 .ship-wrapper {
@@ -256,6 +279,7 @@ button:disabled {
 .form-row {
   display: flex;
   flex-direction: column;
+  flex-basis: 12rem;
 }
 
 fieldset {
@@ -267,9 +291,9 @@ legend {
 }
 
 form {
+  grid-area: form;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
 }
 
 input {

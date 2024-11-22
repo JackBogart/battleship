@@ -2,8 +2,6 @@
 
 ### Todo
 
-- Add player names under respective boards
-  - Do this for both modes
 - Refactor control/view logic
   - Can probably abstract a lot of the view, exposing methods for each view
     (view meaning stage of the game) as needed, and methods related to action

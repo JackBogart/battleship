@@ -16,10 +16,9 @@ function createButton(text, className) {
 export function createView() {
   const planningModal = document.querySelector('.planning-modal');
   const planningForm = document.querySelector('.planning-modal > form');
-  const player1Board = document.querySelector('.player-1');
-  const player2Board = document.querySelector('.player-2');
+  const player1Board = document.querySelector('.player-1 .gameboard');
+  const player2Board = document.querySelector('.player-2 .gameboard');
   const status = document.querySelector('.current-status');
-  const gameboards = document.querySelectorAll('.gameboard');
   const buttons = document.querySelector('.content .buttons');
   const planningShips = document.querySelector(`#${FormFieldType.SHIPS}`);
   const planningBoard = document.querySelector(`.planning-modal .gameboard`);
@@ -27,7 +26,7 @@ export function createView() {
   const playerRadioBtn = document.querySelector('#player');
 
   const init = () => {
-    gameboards.forEach((grid) => {
+    document.querySelectorAll('.gameboard').forEach((grid) => {
       for (let row = 0; row < 10; row++) {
         for (let col = 0; col < 10; col++) {
           const gridCell = document.createElement('div');
@@ -140,6 +139,7 @@ export function createView() {
     }
     player1Board.style.display = 'none';
     player2Board.style.display = 'none';
+    document.querySelector('.gameplay-wrapper').classList.remove('active');
   };
 
   const showPlanningModal = () => {
@@ -326,9 +326,12 @@ export function createView() {
     createShipDragImage(shipElement, false, ship.getLength());
   };
 
-  const showGameplayBoards = () => {
+  const showGameplayBoards = (player1Name, player2Name) => {
     player1Board.style.display = 'grid';
     player2Board.style.display = 'grid';
+    document.querySelector('.gameplay-wrapper').classList.add('active');
+    document.querySelector('.player-1 .player-name').textContent = player1Name;
+    document.querySelector('.player-2 .player-name').textContent = player2Name;
   };
 
   const showReadyButton = () => {
@@ -393,7 +396,7 @@ export function createView() {
 
   // Binders below
   const bindGameboard = (handlers) => {
-    gameboards.forEach((gameboard) => {
+    [player1Board, player2Board].forEach((gameboard) => {
       gameboard.addEventListener('click', (event) => {
         if (event.target.classList.contains('grid-cell')) {
           const isPlayer1Board = event.currentTarget === player1Board;

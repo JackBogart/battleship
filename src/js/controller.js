@@ -282,8 +282,9 @@ export function createController() {
         player2 = createComputerPlayer();
         randomizeBoard(player2);
         isGameInProgress = true;
+        view.removeDraggableShips();
         view.removePreGameControls();
-        view.showGameplayBoards();
+        view.showGameplayBoards(player1.getName(), player2.getName());
         view.resetFormFields();
         view.renderAllPlayerShips(true, player1);
       } else if (player2 === undefined) {
@@ -301,7 +302,7 @@ export function createController() {
       } else {
         isPlayer1Turn = !isPlayer1Turn;
         view.removePreGameControls();
-        view.showGameplayBoards();
+        view.showGameplayBoards(player1.getName(), player2.getName());
         view.resetFormFields();
         view.removeDraggableShips();
         view.showReadyButton();
