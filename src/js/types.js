@@ -3,12 +3,14 @@ export const PlayerType = Object.freeze({
   COMPUTER: Symbol('computer'),
 });
 
+const shipInfo = (type, length) => ({ type, length });
+
 export const ShipType = Object.freeze({
-  CARRIER: 'carrier',
-  BATTLESHIP: 'battleship',
-  DESTROYER: 'destroyer',
-  SUBMARINE: 'submarine',
-  PATROL_BOAT: 'patrol-boat',
+  CARRIER: shipInfo('carrier', 5),
+  BATTLESHIP: shipInfo('battleship', 4),
+  DESTROYER: shipInfo('destroyer', 3),
+  SUBMARINE: shipInfo('submarine', 3),
+  PATROL_BOAT: shipInfo('patrol-boat', 2),
 });
 
 export const TileInfoType = Object.freeze({
