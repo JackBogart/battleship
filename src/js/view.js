@@ -16,8 +16,8 @@ function createButton(text, className) {
 export function createView() {
   const planningModal = document.querySelector('.planning-modal');
   const planningForm = document.querySelector('.planning-modal > form');
-  const player1Board = document.querySelector('.player-1 .gameboard');
-  const player2Board = document.querySelector('.player-2 .gameboard');
+  const player1Board = document.querySelector('.player-1.gameboard');
+  const player2Board = document.querySelector('.player-2.gameboard');
   const buttons = document.querySelector('.content .buttons');
   const planningShips = document.querySelector(`#${FormFieldType.SHIPS}`);
   const planningBoard = document.querySelector(`.planning-modal .gameboard`);
@@ -276,8 +276,8 @@ export function createView() {
     player1Board.style.display = 'grid';
     player2Board.style.display = 'grid';
     document.querySelector('.gameplay-wrapper').classList.add('active');
-    document.querySelector('.player-1 .player-name').textContent = player1Name;
-    document.querySelector('.player-2 .player-name').textContent = player2Name;
+    document.querySelector('.player-1.player-name').textContent = player1Name;
+    document.querySelector('.player-2.player-name').textContent = player2Name;
   };
 
   const setStatusPlayersTurn = (name) => {
@@ -326,6 +326,11 @@ export function createView() {
         'Please place all ships onto the board.';
     }
   };
+
+  const getFormData = () => ({
+    name: planningForm.name.value,
+    opponent: planningForm.opponent.value,
+  });
 
   const renderGameOver = (isPlayer1, attackingPlayer) => {
     updateStatusMessage(`${attackingPlayer.getName()} wins!`);
@@ -406,31 +411,28 @@ export function createView() {
   };
 
   // Binders below
-  const bindGameboard = (handlers) => {
+  const bindGameboards = (handlers) => {
     [player1Board, player2Board].forEach((gameboard) => {
       gameboard.addEventListener('click', (event) => {
         if (event.target.classList.contains('grid-cell')) {
-          const isPlayer1Board = event.currentTarget === player1Board;
-          const row = event.target.dataset.row;
-          const col = event.target.dataset.col;
-
-          handlers.receiveAttack(row, col, isPlayer1Board);
+          handlers.receiveAttack(event);
         }
       });
     });
 
     planningBoard.addEventListener('click', (event) => {
       if (event.target.classList.contains('ship-container')) {
-        handlers.rotate(event.target.dataset.type);
+        handlers.rotate(event);
       }
     });
   };
 
   const bindButtons = (handlers) => {
     buttons.addEventListener('click', (event) => {
-      if (event.target.classList.contains('start-game')) {
-        handlers.start();
-      } else if (event.target.classList.contains('play-again')) {
+      if (
+        event.target.classList.contains('start-game') ||
+        event.target.classList.contains('play-again')
+      ) {
         handlers.start();
       } else if (event.target.classList.contains('ready')) {
         handlers.ready();
@@ -440,27 +442,49 @@ export function createView() {
 
   const bindDragAndDrop = (handlers) => {
     // Ships
-    planningShips.addEventListener('dragstart', handlers.dragStart);
-    planningShips.addEventListener('dragend', handlers.dragEnd);
-    planningShips.addEventListener('dragover', handlers.dragOver);
-    planningShips.addEventListener('drop', handlers.drop);
+    planningShips.addEventListener('dragover', handlers.shipsDragoverHandler);
 
     // Planning Board
-    planningBoard.addEventListener('dragstart', handlers.dragStart);
-    planningBoard.addEventListener('dragend', handlers.dragEnd);
-    planningBoard.addEventListener('dragover', handlers.dragOver);
-    planningBoard.addEventListener('drop', handlers.drop);
-    planningBoard.addEventListener('dragleave', handlers.leave);
+    planningBoard.addEventListener('dragleave', handlers.dragleaveHandler);
+    planningBoard.addEventListener('dragover', (event) => {
+      if (event.target.classList.contains('gameboard')) {
+        handlers.boardGapDragoverHandler();
+      } else if (event.target.classList.contains('grid-cell')) {
+        handlers.gridCellDragoverHandler(event);
+      }
+    });
+
+    // Planning Modal
+    planningModal.addEventListener('dragstart', (event) => {
+      if (
+        event.target.tagName === 'DIV' &&
+        event.target.classList.contains('ship-container')
+      ) {
+        handlers.dragstartHandler(event);
+      }
+    });
+    planningModal.addEventListener('dragend', (event) => {
+      if (
+        event.target.tagName === 'DIV' &&
+        event.target.classList.contains('ship-container')
+      ) {
+        handlers.dragendHandler();
+      }
+    });
+    planningModal.addEventListener('drop', (event) => {
+      if (event.target.classList.contains('grid-cell')) {
+        handlers.boardDropHandler(event);
+      } else if (event.target.id === `${FormFieldType.SHIPS}`) {
+        handlers.shipsDropHandler(event);
+      }
+    });
   };
 
   const bindModalButtons = (handlers) => {
     planningModal.addEventListener('submit', (event) => {
-      handlers.submit(
-        event,
-        planningForm.name.value,
-        planningForm.opponent.value,
-      );
+      handlers.submit(event);
     });
+
     planningModal.addEventListener('click', (event) => {
       if (event.target.classList.contains('randomize')) {
         handlers.randomize();
@@ -468,13 +492,13 @@ export function createView() {
     });
   };
 
-  const bindName = (handler) => {
+  const bindNameField = (handler) => {
     document
       .querySelector(`#${FormFieldType.NAME}`)
       .addEventListener('input', handler);
   };
 
-  const bindOpponent = (handler) => {
+  const bindOpponentField = (handler) => {
     document
       .querySelector(`#${FormFieldType.OPPONENT}`)
       .addEventListener('change', handler);
@@ -483,9 +507,9 @@ export function createView() {
   return {
     bindButtons,
     bindDragAndDrop,
-    bindGameboard,
-    bindName,
-    bindOpponent,
+    bindGameboards,
+    bindNameField,
+    bindOpponentField,
     removeFormErrors,
     isFieldMarkedInvalid,
     bindModalButtons,
@@ -509,6 +533,7 @@ export function createView() {
     renderActivePlayer,
     renderShipDragStart,
     renderShipDragEnd,
+    getFormData,
   };
 }
 

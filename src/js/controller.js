@@ -84,7 +84,12 @@ export function createController() {
    * @param {number} col - The column being attacked
    * @param {boolean} isPlayer1Attacked - true if player 1 is being attacked
    */
-  const receiveAttackHandler = (row, col, isPlayer1Attacked) => {
+  const receiveAttackHandler = (event) => {
+    const isPlayer1Attacked =
+      event.currentTarget.classList.contains('player-1');
+    const row = event.target.dataset.row;
+    const col = event.target.dataset.col;
+
     const isPlayer2Computer = player2.getType() === PlayerType.COMPUTER;
     if (
       (isPlayer1Attacked && isPlayer2Computer) ||
@@ -123,7 +128,7 @@ export function createController() {
     }
   };
 
-  const handleRandomizeShips = () => {
+  const randomizeShipsHandler = () => {
     const player = getPlayer(isPlayer1Turn);
     player.removeAllShips();
     randomizeBoard(player);
@@ -133,7 +138,7 @@ export function createController() {
     }
   };
 
-  const handleStartGame = () => {
+  const startGameHandler = () => {
     view.renderPlayer1PlanningForm();
     player1 = createPlayer('Player', PlayerType.HUMAN);
     player2 = undefined;
@@ -141,68 +146,77 @@ export function createController() {
   };
 
   const dragstartHandler = (event) => {
-    if (event.target.classList.contains('ship-container')) {
-      const shipContainer = event.target;
-      const { offsetX, offsetY } = getXYOffsets(shipContainer);
-      const dragImage = view.getShipDragImage(shipContainer.dataset.type);
+    const shipContainer = event.target;
+    const { offsetX, offsetY } = getXYOffsets(shipContainer);
+    const dragImage = view.getShipDragImage(shipContainer.dataset.type);
 
-      event.dataTransfer.setData('text/plain', shipContainer.dataset.type);
-      event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
-      event.dataTransfer.dropEffect = 'move';
+    event.dataTransfer.setData('text/plain', shipContainer.dataset.type);
+    event.dataTransfer.setDragImage(dragImage, offsetX, offsetY);
+    event.dataTransfer.dropEffect = 'move';
 
-      // This sucks. This is a workaround due to a long existing bug in chrome.
-      // If you manipulate DOM nodes during the 'dragstart' event, chrome
-      // immediately fires the 'dragend' event. It's ridiculous that this
-      // issue exists at least as far back as 2013. The drag and drop API spec
-      // is awful in general. https://stackoverflow.com/questions/11927309
-      setTimeout(() => {
-        view.renderShipDragStart(shipContainer, dragImage);
-      }, 0);
-    }
+    // This sucks. This is a workaround due to a long existing bug in chrome.
+    // If you manipulate DOM nodes during the 'dragstart' event, chrome
+    // immediately fires the 'dragend' event. It's ridiculous that this
+    // issue exists at least as far back as 2013. The drag and drop API spec
+    // is awful in general. https://stackoverflow.com/questions/11927309
+    setTimeout(() => {
+      view.renderShipDragStart(shipContainer, dragImage);
+    }, 0);
   };
 
-  const dragendHandler = (event) => {
-    if (event.target.classList.contains('ship-container')) {
-      view.renderShipDragEnd();
-    }
+  const dragendHandler = () => {
+    view.renderShipDragEnd();
   };
 
-  const dragoverHandler = (event) => {
+  const shipsDragoverHandler = (event) => {
     const shipType = view.getActiveDragImageType();
     if (!shipType) {
       return;
     }
 
     event.preventDefault();
+  };
 
-    if (event.target.classList.contains('grid-cell')) {
-      event.dataTransfer.dropEffect = 'move';
-
-      const player = getPlayer(isPlayer1Turn);
-      const newRow = Number(event.target.dataset.row);
-      const newCol = Number(event.target.dataset.col);
-      const positionData = player.getInitialPosition(shipType);
-      let ship, isVertical;
-
-      if (positionData === undefined) {
-        ship = createShip(shipType);
-        isVertical = false;
-      } else {
-        ship = player.getShip(positionData.row, positionData.col);
-        isVertical = positionData.isVertical;
-      }
-      const isValid = player.isValidPlacement(ship, newRow, newCol, isVertical);
-
-      view.moveShipInsertionMarker(
-        newRow,
-        newCol,
-        isValid,
-        ship.getLength(),
-        isVertical,
-      );
-    } else {
-      view.hideShipInsertionMarker();
+  const boardGapDragoverHandler = () => {
+    const shipType = view.getActiveDragImageType();
+    if (!shipType) {
+      return;
     }
+
+    view.hideShipInsertionMarker();
+  };
+
+  const gridCellDragoverHandler = (event) => {
+    const shipType = view.getActiveDragImageType();
+    if (!shipType) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = 'move';
+
+    const player = getPlayer(isPlayer1Turn);
+    const newRow = Number(event.target.dataset.row);
+    const newCol = Number(event.target.dataset.col);
+    const positionData = player.getInitialPosition(shipType);
+    let ship, isVertical;
+
+    if (positionData === undefined) {
+      ship = createShip(shipType);
+      isVertical = false;
+    } else {
+      ship = player.getShip(positionData.row, positionData.col);
+      isVertical = positionData.isVertical;
+    }
+    const isValid = player.isValidPlacement(ship, newRow, newCol, isVertical);
+
+    view.moveShipInsertionMarker(
+      newRow,
+      newCol,
+      isValid,
+      ship.getLength(),
+      isVertical,
+    );
   };
 
   const dragleaveHandler = () => {
@@ -213,58 +227,72 @@ export function createController() {
     view.hideShipInsertionMarker();
   };
 
-  const dropHandler = (event) => {
+  const boardDropHandler = (event) => {
     const shipType = event.dataTransfer.getData('text/plain');
     if (!SHIP_TYPES.includes(shipType)) {
       return;
     }
 
     event.preventDefault();
+
+    const player = getPlayer(isPlayer1Turn);
+    const positionData = player.getInitialPosition(shipType);
+    const newRow = Number(event.target.dataset.row);
+    const newCol = Number(event.target.dataset.col);
+    let ship, isVertical;
+
+    // If new ship, else move existing ship
+    if (!positionData) {
+      ship = createShip(shipType);
+      isVertical = false;
+    } else {
+      ship = player.getShip(positionData.row, positionData.col);
+      isVertical = positionData.isVertical;
+    }
+
+    if (player.isValidPlacement(ship, newRow, newCol, isVertical)) {
+      if (positionData) {
+        player.removeShip(positionData.row, positionData.col);
+      }
+      player.setShip(ship, newRow, newCol, isVertical);
+      view.placeShip(
+        newRow,
+        newCol,
+        isVertical,
+        ship.getType(),
+        ship.getLength(),
+      );
+
+      if (
+        player.getAllShips().length === 5 &&
+        view.isFieldMarkedInvalid(FormFieldType.SHIPS)
+      ) {
+        view.removeFormErrors(FormFieldType.SHIPS);
+      }
+    }
+  };
+
+  const shipsDropHandler = (event) => {
+    const shipType = event.dataTransfer.getData('text/plain');
+    if (!SHIP_TYPES.includes(shipType)) {
+      return;
+    }
+
+    event.preventDefault();
+
     const player = getPlayer(isPlayer1Turn);
     const positionData = player.getInitialPosition(shipType);
 
-    if (event.target.classList.contains('grid-cell')) {
-      const newRow = Number(event.target.dataset.row);
-      const newCol = Number(event.target.dataset.col);
-      let ship, isVertical;
-
-      // If new ship, else move existing ship
-      if (!positionData) {
-        ship = createShip(shipType);
-        isVertical = false;
-      } else {
-        ship = player.getShip(positionData.row, positionData.col);
-        isVertical = positionData.isVertical;
-      }
-
-      if (player.isValidPlacement(ship, newRow, newCol, isVertical)) {
-        if (positionData) {
-          player.removeShip(positionData.row, positionData.col);
-        }
-        player.setShip(ship, newRow, newCol, isVertical);
-        view.placeShip(
-          newRow,
-          newCol,
-          isVertical,
-          ship.getType(),
-          ship.getLength(),
-        );
-
-        if (
-          player.getAllShips().length === 5 &&
-          view.isFieldMarkedInvalid(FormFieldType.SHIPS)
-        ) {
-          view.removeFormErrors(FormFieldType.SHIPS);
-        }
-      }
-    } else if (event.target.id === FormFieldType.SHIPS && positionData) {
+    // Only need to 'return' ship if it's been placed previously
+    if (positionData) {
       const ship = createShip(shipType);
       player.removeShip(positionData.row, positionData.col);
       view.returnShip(ship.getType(), ship.getLength());
     }
   };
 
-  const rotateShipHandler = (shipType) => {
+  const rotateShipHandler = (event) => {
+    const shipType = event.target.dataset.type;
     const player = getPlayer(isPlayer1Turn);
     const { row, col, isVertical } = player.getInitialPosition(shipType);
     const ship = player.getShip(row, col);
@@ -276,7 +304,8 @@ export function createController() {
     }
   };
 
-  const submitHandler = (event, name, opponent) => {
+  const submitHandler = (event) => {
+    const { name, opponent } = view.getFormData();
     const player = getPlayer(isPlayer1Turn);
 
     if (view.isFormValid() && player.getAllShips().length === 5) {
@@ -325,27 +354,40 @@ export function createController() {
 
   const run = () => {
     view.initializeBoards();
-    view.bindGameboard({
+
+    // Gameboard interactions
+    view.bindGameboards({
       receiveAttack: receiveAttackHandler,
       rotate: rotateShipHandler,
     });
+
+    // Button interactions
     view.bindButtons({
-      start: handleStartGame,
+      start: startGameHandler,
       ready: readyHandler,
     });
+
+    // Drag-and-drop interactions
     view.bindDragAndDrop({
-      dragStart: dragstartHandler,
-      dragEnd: dragendHandler,
-      dragOver: dragoverHandler,
-      drop: dropHandler,
-      leave: dragleaveHandler,
+      dragstartHandler,
+      dragendHandler,
+      boardGapDragoverHandler,
+      gridCellDragoverHandler,
+      boardDropHandler,
+      shipsDropHandler,
+      dragleaveHandler,
+      shipsDragoverHandler,
     });
+
+    // Modal interactions
     view.bindModalButtons({
-      randomize: handleRandomizeShips,
+      randomize: randomizeShipsHandler,
       submit: submitHandler,
     });
-    view.bindName(nameInputHandler);
-    view.bindOpponent(opponentInputHandler);
+
+    // Form inputs
+    view.bindNameField(nameInputHandler);
+    view.bindOpponentField(opponentInputHandler);
   };
 
   return { run };
