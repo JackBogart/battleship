@@ -299,8 +299,8 @@ const returnShip = function returnShipToSelectionArea(type, length) {
   const shipSelector = `.planning-ship[data-type="${type}"]`;
   const shipElement = document.querySelector(shipSelector);
 
-  // When the ship isn't placed on the board yet, (first placement)
-  if (planningShips.querySelector(!shipSelector)) {
+  // Only add to ships when the ship is already placed on the board
+  if (!planningShips.querySelector(shipSelector)) {
     planningShips.appendChild(shipElement);
   }
 
