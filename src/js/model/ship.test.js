@@ -1,9 +1,9 @@
 import { createShip } from './ship';
-import { ShipType } from '../types';
+import { shipType } from '../types';
 
 describe('Ship', () => {
   it('should return a length of 3', () => {
-    const ship = createShip(ShipType.DESTROYER.type);
+    const ship = createShip(shipType.DESTROYER.type);
 
     const length = ship.getLength();
 
@@ -11,11 +11,11 @@ describe('Ship', () => {
   });
 
   it('should throw an error for an unknown ship type', () => {
-    expect(() => createShip(ShipType.FAKE)).toThrow('Invalid ship type');
+    expect(() => createShip(shipType.FAKE)).toThrow('Invalid ship type');
   });
 
   it('should not be sunk if hit fewer times than its length', () => {
-    const ship = createShip(ShipType.DESTROYER.type);
+    const ship = createShip(shipType.DESTROYER.type);
 
     ship.hit();
     ship.hit();
@@ -24,7 +24,7 @@ describe('Ship', () => {
   });
 
   it('should be sunk if hit equal to its length', () => {
-    const ship = createShip(ShipType.DESTROYER.type);
+    const ship = createShip(shipType.DESTROYER.type);
 
     ship.hit();
     ship.hit();
@@ -34,7 +34,7 @@ describe('Ship', () => {
   });
 
   it("should return the ship's type", () => {
-    const ship = createShip(ShipType.CARRIER.type);
+    const ship = createShip(shipType.CARRIER.type);
 
     expect(ship.getType()).toBe('carrier');
   });

@@ -1,54 +1,75 @@
 import { NUM_OF_COLUMNS, NUM_OF_ROWS } from '../constants';
 import { createGameboard } from './gameboard';
-import { PlayerType, TileInfoType } from '../types';
+import { playerType, tileInfoType } from '../types';
 import { getRandomInt, shuffleArray } from '../utils/random';
 
 export function createPlayer(name, playerType) {
   const gameboard = createGameboard();
 
-  const getName = () => name;
+  const getName = function getName() {
+    return name;
+  };
 
-  const setName = (newName) => {
+  const setName = function setName(newName) {
     name = newName;
   };
 
-  const getType = () => playerType;
+  const getType = function getType() {
+    return playerType;
+  };
 
-  const getShip = (row, col) => gameboard.getShip(row, col);
+  const getShip = function getShip(row, col) {
+    return gameboard.getShip(row, col);
+  };
 
-  const setShip = (ship, row, col, isVertical = false) => {
+  const setShip = function setShip(ship, row, col, isVertical = false) {
     gameboard.setShip(ship, row, col, isVertical);
   };
-  const getInfoBoard = () => gameboard.getInfoBoard();
+  const getInfoBoard = function getInfoBoard() {
+    return gameboard.getInfoBoard();
+  };
 
-  const getTileInfo = (row, col) => gameboard.getTileInfo(row, col);
+  const getTileInfo = function getTileInfo(row, col) {
+    return gameboard.getTileInfo(row, col);
+  };
 
-  const receiveAttack = (row, col) => {
+  const receiveAttack = function receiveAttack(row, col) {
     gameboard.receiveAttack(row, col);
   };
 
-  const isFleetSunk = () => gameboard.isFleetSunk();
+  const isFleetSunk = function isFleetSunk() {
+    return gameboard.isFleetSunk();
+  };
 
-  const isValidPlacement = (ship, row, col, isVertical) =>
-    gameboard.isValidPlacement(ship, row, col, isVertical);
+  const isValidPlacement = function isValidPlacement(
+    ship,
+    row,
+    col,
+    isVertical,
+  ) {
+    return gameboard.isValidPlacement(ship, row, col, isVertical);
+  };
 
-  const getShipType = (row, col) => {
+  const getShipType = function getShipType(row, col) {
     const ship = getShip(row, col);
     return ship === null ? '' : ship.getType();
   };
 
-  const removeAllShips = () => {
+  const removeAllShips = function removeAllShips() {
     gameboard.removeAllShips();
   };
 
-  const getInitialPosition = (shipType) =>
-    gameboard.getInitialPosition(shipType);
+  const getInitialPosition = function getInitialPosition(shipType) {
+    return gameboard.getInitialPosition(shipType);
+  };
 
-  const removeShip = (row, col) => {
+  const removeShip = function removeShip(row, col) {
     gameboard.removeShip(row, col);
   };
 
-  const getAllShips = () => gameboard.getAllShips();
+  const getAllShips = function getAllShips() {
+    return gameboard.getAllShips();
+  };
 
   return {
     getAllShips,
@@ -70,13 +91,13 @@ export function createPlayer(name, playerType) {
 }
 
 export function createComputerPlayer() {
-  const player = createPlayer('Computer', PlayerType.COMPUTER);
+  const player = createPlayer('Computer', playerType.COMPUTER);
   let lastAttack;
 
-  const getComputerAttack = (infoBoard) => {
+  const getComputerAttack = function getComputerAttack(infoBoard) {
     if (
       lastAttack !== undefined &&
-      infoBoard[lastAttack.row][lastAttack.col] === TileInfoType.HIT
+      infoBoard[lastAttack.row][lastAttack.col] === tileInfoType.HIT
     ) {
       const directions = shuffleArray([
         [0, 1],
@@ -94,7 +115,7 @@ export function createComputerPlayer() {
           row < NUM_OF_ROWS &&
           col >= 0 &&
           col < NUM_OF_COLUMNS &&
-          infoBoard[row][col] === TileInfoType.UNKNOWN
+          infoBoard[row][col] === tileInfoType.UNKNOWN
         ) {
           return [row, col];
         }
@@ -103,7 +124,7 @@ export function createComputerPlayer() {
     let row = getRandomInt(10);
     let col = getRandomInt(10);
 
-    while (infoBoard[row][col] !== TileInfoType.UNKNOWN) {
+    while (infoBoard[row][col] !== tileInfoType.UNKNOWN) {
       row = getRandomInt(10);
       col = getRandomInt(10);
     }
@@ -111,7 +132,7 @@ export function createComputerPlayer() {
     return [row, col];
   };
 
-  const updateLastAttack = (row, col) => {
+  const updateLastAttack = function updateLastAttack(row, col) {
     lastAttack = { row, col };
   };
 

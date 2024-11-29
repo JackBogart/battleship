@@ -14,10 +14,19 @@ export function createShip(shipType) {
 
   let hits = 0;
 
-  const getLength = () => length;
-  const getType = () => shipType;
-  const isSunk = () => hits === length;
-  const hit = () => {
+  const getLength = function getLength() {
+    return length;
+  };
+
+  const getType = function getType() {
+    return shipType;
+  };
+
+  const isSunk = function isSunk() {
+    return hits === length;
+  };
+
+  const hit = function hit() {
     if (!isSunk()) {
       hits += 1;
     }

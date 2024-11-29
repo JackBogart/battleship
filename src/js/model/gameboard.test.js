@@ -1,6 +1,6 @@
 import { createGameboard } from './gameboard';
 import { createShip } from './ship';
-import { TileInfoType } from '../types';
+import { tileInfoType } from '../types';
 
 jest.mock('./ship', () => ({
   createShip: jest.fn(),
@@ -110,7 +110,7 @@ describe('infoBoard', () => {
 
     expect(
       infoBoard.every((row) =>
-        row.every((tile) => tile === TileInfoType.UNKNOWN),
+        row.every((tile) => tile === tileInfoType.UNKNOWN),
       ),
     ).toBe(true);
   });
@@ -118,14 +118,14 @@ describe('infoBoard', () => {
   it("should return a tile that isn't hit", () => {
     const tileInfo = gameboard.getTileInfo(1, 1);
 
-    expect(tileInfo).toBe(TileInfoType.UNKNOWN);
+    expect(tileInfo).toBe(tileInfoType.UNKNOWN);
   });
 
   it('should mark an attacked empty tile as missed', () => {
     gameboard.receiveAttack(1, 1);
     const tileInfo = gameboard.getTileInfo(1, 1);
 
-    expect(tileInfo).toBe(TileInfoType.MISSED);
+    expect(tileInfo).toBe(tileInfoType.MISSED);
   });
 
   it('should mark an attacked occupied tile as hit', () => {
@@ -136,7 +136,7 @@ describe('infoBoard', () => {
     gameboard.receiveAttack(1, 1);
     const tileInfo = gameboard.getTileInfo(1, 1);
 
-    expect(tileInfo).toBe(TileInfoType.HIT);
+    expect(tileInfo).toBe(tileInfoType.HIT);
   });
 });
 

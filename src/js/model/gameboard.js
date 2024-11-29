@@ -1,5 +1,5 @@
 import { NUM_OF_COLUMNS, NUM_OF_ROWS } from '../constants';
-import { TileInfoType } from '../types';
+import { tileInfoType } from '../types';
 
 export function createGameboard() {
   let shipData = {};
@@ -10,11 +10,18 @@ export function createGameboard() {
 
   const infoBoard = new Array(NUM_OF_ROWS)
     .fill(null)
-    .map(() => new Array(NUM_OF_COLUMNS).fill(TileInfoType.UNKNOWN));
+    .map(() => new Array(NUM_OF_COLUMNS).fill(tileInfoType.UNKNOWN));
 
-  const getShip = (row, col) => board[row][col];
+  const getShip = function getShip(row, col) {
+    return board[row][col];
+  };
 
-  const isValidPlacement = (ship, row, col, isVertical) => {
+  const isValidPlacement = function isValidPlacement(
+    ship,
+    row,
+    col,
+    isVertical,
+  ) {
     const shipLength = ship.getLength();
     if (isVertical) {
       if (row + shipLength > NUM_OF_ROWS) {
@@ -38,7 +45,7 @@ export function createGameboard() {
     return true;
   };
 
-  const setShip = (ship, row, col, isVertical) => {
+  const setShip = function setShip(ship, row, col, isVertical) {
     const shipLength = ship.getLength();
 
     for (let i = 0; i < shipLength; i++) {
@@ -56,23 +63,29 @@ export function createGameboard() {
     };
   };
 
-  const getInfoBoard = () => infoBoard.map((row) => [...row]);
-  const getTileInfo = (row, col) => infoBoard[row][col];
+  const getInfoBoard = function getInfoBoard() {
+    return infoBoard.map((row) => [...row]);
+  };
 
-  const receiveAttack = (row, col) => {
-    if (board[row][col] === null) {
-      infoBoard[row][col] = TileInfoType.MISSED;
+  const getTileInfo = function getTileInfo(row, col) {
+    return infoBoard[row][col];
+  };
+
+  const receiveAttack = function receiveAttack(row, col) {
+    if (!board[row][col]) {
+      infoBoard[row][col] = tileInfoType.MISSED;
     } else {
       board[row][col].hit();
-      infoBoard[row][col] = TileInfoType.HIT;
+      infoBoard[row][col] = tileInfoType.HIT;
     }
   };
 
-  const isFleetSunk = () =>
-    Object.values(shipData).every((entry) => entry.ship.isSunk());
+  const isFleetSunk = function isFleetSunk() {
+    return Object.values(shipData).every((entry) => entry.ship.isSunk());
+  };
 
-  const getInitialPosition = (shipType) => {
-    if (shipData[shipType] === undefined) {
+  const getInitialPosition = function getInitialPosition(shipType) {
+    if (!shipData[shipType]) {
       return undefined;
     }
 
@@ -84,7 +97,7 @@ export function createGameboard() {
     };
   };
 
-  const removeShip = (targetedRow, targetedCol) => {
+  const removeShip = function removeShip(targetedRow, targetedCol) {
     if (board[targetedRow][targetedCol] === null) {
       throw new Error('Cannot remove ship, no ship exists at location');
     }
@@ -103,18 +116,19 @@ export function createGameboard() {
     delete shipData[shipType];
   };
 
-  const removeAllShips = () => {
+  const removeAllShips = function removeAllShips() {
     board = new Array(NUM_OF_ROWS)
       .fill(null)
       .map(() => new Array(NUM_OF_COLUMNS).fill(null));
     shipData = {};
   };
 
-  const getAllShips = () =>
-    Object.values(shipData).reduce((ships, data) => {
+  const getAllShips = function getAllShips() {
+    return Object.values(shipData).reduce((ships, data) => {
       ships.push(data.ship);
       return ships;
     }, []);
+  };
 
   return {
     getAllShips,

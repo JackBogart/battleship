@@ -1,7 +1,7 @@
 import { createGameboard } from './gameboard';
 import { createComputerPlayer, createPlayer } from './player';
 import { createShip } from './ship';
-import { PlayerType, TileInfoType } from '../types';
+import { playerType, tileInfoType } from '../types';
 import { getRandomInt, shuffleArray } from '../utils/random';
 
 jest.mock('./gameboard', () => {
@@ -37,7 +37,7 @@ let player;
 
 describe('player', () => {
   beforeEach(() => {
-    player = createPlayer('Billy', PlayerType.HUMAN);
+    player = createPlayer('Billy', playerType.HUMAN);
   });
 
   afterEach(() => {
@@ -58,9 +58,9 @@ describe('player', () => {
   });
 
   it("should return a human players's type", () => {
-    const playerType = player.getType();
+    const type = player.getType();
 
-    expect(playerType).toBe(PlayerType.HUMAN);
+    expect(type).toBe(playerType.HUMAN);
   });
 
   it('should place a ship at the specified location', () => {
@@ -110,15 +110,15 @@ describe('computer player', () => {
   });
 
   it("should return a computer players's type", () => {
-    const playerType = player.getType();
+    const type = player.getType();
 
-    expect(playerType).toBe(PlayerType.COMPUTER);
+    expect(type).toBe(playerType.COMPUTER);
   });
 
   it('should return a valid attack location', () => {
     const infoBoard = new Array(10)
       .fill(null)
-      .map(() => new Array(10).fill(TileInfoType.UNKNOWN));
+      .map(() => new Array(10).fill(tileInfoType.UNKNOWN));
     getRandomInt.mockReturnValueOnce(3).mockReturnValueOnce(5);
 
     const [row, col] = player.getComputerAttack(infoBoard);
@@ -130,8 +130,8 @@ describe('computer player', () => {
   it('should retry when a random location is already attacked', () => {
     const infoBoard = new Array(10)
       .fill(null)
-      .map(() => new Array(10).fill(TileInfoType.UNKNOWN));
-    infoBoard[3][5] = TileInfoType.HIT;
+      .map(() => new Array(10).fill(tileInfoType.UNKNOWN));
+    infoBoard[3][5] = tileInfoType.HIT;
     getRandomInt
       .mockReturnValueOnce(3)
       .mockReturnValueOnce(5)
@@ -148,8 +148,8 @@ describe('computer player', () => {
   it('should attack an adjacent tile when the last attack was a hit', () => {
     const infoBoard = new Array(10)
       .fill(null)
-      .map(() => new Array(10).fill(TileInfoType.UNKNOWN));
-    infoBoard[3][5] = TileInfoType.HIT;
+      .map(() => new Array(10).fill(tileInfoType.UNKNOWN));
+    infoBoard[3][5] = tileInfoType.HIT;
     player.updateLastAttack(3, 5);
     shuffleArray.mockReturnValueOnce([
       [1, 0],

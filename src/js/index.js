@@ -1,6 +1,5 @@
 import 'normalize.css';
 import '../css/style.css';
-import { createController } from './controller';
+import { controller as app } from './controller';
 
-const app = createController();
 app.run();
