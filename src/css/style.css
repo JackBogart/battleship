@@ -404,11 +404,6 @@ input:disabled {
   opacity: 0.3;
 }
 
-.dark-mode-toggle {
-  display: flex;
-  gap: 0.4rem;
-}
-
 .toggle {
   display: block;
   position: relative;
