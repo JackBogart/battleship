@@ -10,9 +10,6 @@ const planningShips = document.querySelector(`#${formFieldType.SHIPS}`);
 const planningBoard = document.querySelector(`.planning-modal .gameboard`);
 const computerRadioBtn = document.querySelector('#computer');
 const playerRadioBtn = document.querySelector('#player');
-const shipCellColor = getComputedStyle(
-  document.documentElement,
-).getPropertyValue('--ship-cell-color');
 
 const createButton = function createButton(text, className) {
   const button = document.createElement('button');
@@ -61,10 +58,8 @@ const renderPlayerShips = function renderPlayerShips(isPlayer1, player) {
   forEachGridCell((row, col) => {
     const tile = board.querySelector(`[data-row="${row}"][data-col="${col}"]`);
 
-    if (!player.getShip(row, col)) {
-      tile.style.backgroundColor = '';
-    } else if (!player.getShip(row, col).isSunk()) {
-      tile.style.backgroundColor = shipCellColor;
+    if (player.getShip(row, col) && !player.getShip(row, col).isSunk()) {
+      tile.classList.add('ship-cell');
     }
   });
 };
@@ -75,8 +70,8 @@ const hidePlayerShips = function hidePlayerShips(isPlayer1, player) {
   forEachGridCell((row, col) => {
     const tile = board.querySelector(`[data-row="${row}"][data-col="${col}"]`);
 
-    if (player.getShip(row, col) && !player.getShip(row, col).isSunk()) {
-      tile.style.backgroundColor = '';
+    if (player.getShip(row, col)) {
+      tile.classList.remove('ship-cell');
     }
   });
 };
@@ -97,7 +92,8 @@ const renderSunkenShip = function renderSunkenShip(
     const tile = board.querySelector(
       `[data-row="${currentRow}"][data-col="${currentCol}"]`,
     );
-    tile.style.backgroundColor = 'red';
+    tile.classList.add('sunken');
+    tile.classList.remove('hit-cell');
   }
 };
 
@@ -126,7 +122,6 @@ const resetPlayerBoards = function resetAllPlayerBoards() {
       const tile = board.querySelector(
         `[data-row="${row}"][data-col="${col}"]`,
       );
-      tile.style.backgroundColor = '';
       tile.classList = 'grid-cell';
     });
   });
@@ -470,6 +465,19 @@ const renderShipDragEnd = function renderShipDragEnd() {
   getActiveDragImage().classList.remove('active');
 };
 
+const setTheme = function setTheme(theme) {
+  document.documentElement.className = theme;
+};
+
+const toggleDarkMode = function toggleDarkMode() {
+  document.querySelector('#dark-mode').checked = true;
+  setTheme('dark');
+};
+
+const isDarkModeToggled = function isDarkModeToggled() {
+  return document.querySelector('#dark-mode').checked;
+};
+
 // Binders below
 const bindGameboards = function bindGameboardsHandlers(handlers) {
   [player1Board, player2Board].forEach((gameboard) => {
@@ -564,6 +572,10 @@ const bindOpponentField = function bindOpponentFieldHandler(handler) {
     .addEventListener('change', handler);
 };
 
+const bindDarkModeToggle = function bindDarkModeToggle(handler) {
+  document.querySelector('#dark-mode').addEventListener('change', handler);
+};
+
 export const view = {
   bindButtons,
   bindDragAndDrop,
@@ -572,6 +584,7 @@ export const view = {
   bindOpponentField,
   removeFormErrors,
   isFieldMarkedInvalid,
+  setTheme,
   bindModalButtons,
   getActiveDragImageType,
   getShipDragImage,
@@ -593,6 +606,9 @@ export const view = {
   renderShipDragStart,
   renderShipDragEnd,
   getFormData,
+  bindDarkModeToggle,
+  toggleDarkMode,
+  isDarkModeToggled,
 };
 
 export function getXYOffsets(ship) {

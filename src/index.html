@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -61,20 +61,35 @@
         </div>
       </form>
     </dialog>
-    <div class="header">Battleship</div>
+    <div class="header">
+      <h2>Battleship</h2>
+
+      <div class="dark-mode-toggle">
+        <label for="dark-mode" class="toggle">
+          <input
+            type="checkbox"
+            name="dark-mode"
+            id="dark-mode"
+            autocomplete="off"
+          />
+          <span class="slider"></span>
+          <div class="toggle-icon"></div>
+        </label>
+      </div>
+    </div>
     <div class="content">
       <div class="status"></div>
       <div class="gameplay-wrapper">
         <div class="gameboard-wrapper">
-          <div class="gameboard player-1"></div>
           <div class="player-name player-1"></div>
+          <div class="gameboard player-1"></div>
         </div>
         <div class="buttons">
           <button type="button" class="start-game">Start Game</button>
         </div>
         <div class="gameboard-wrapper">
-          <div class="gameboard player-2"></div>
           <div class="player-name player-2"></div>
+          <div class="gameboard player-2"></div>
         </div>
       </div>
     </div>

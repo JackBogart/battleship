@@ -351,6 +351,12 @@ const readyHandler = function readyHandler() {
   isGameInProgress = true;
 };
 
+const darkModeHandler = function darkModeToggleHandler() {
+  const newTheme = view.isDarkModeToggled() ? 'dark' : 'light';
+  view.setTheme(newTheme);
+  localStorage.setItem('theme', newTheme);
+};
+
 const run = function run() {
   // Gameboard interactions
   view.bindGameboards({
@@ -385,6 +391,16 @@ const run = function run() {
   // Form inputs
   view.bindNameField(nameInputHandler);
   view.bindOpponentField(opponentInputHandler);
+
+  // Dark mode toggle
+  view.bindDarkModeToggle(darkModeHandler);
+
+  const theme = localStorage.getItem('theme');
+  if (!theme) {
+    localStorage.setItem('theme', 'light');
+  } else if (theme === 'dark') {
+    view.toggleDarkMode();
+  }
 };
 
 export const controller = { run };

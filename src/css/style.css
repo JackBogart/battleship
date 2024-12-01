@@ -11,44 +11,58 @@
     'Open Sans',
     'Helvetica Neue',
     sans-serif;
-  color: white;
-  --primary-hue: 229;
-  --primary-saturation: 78%;
+  --primary-hue: 266;
+  --primary-saturation: 60%;
   --primary-luminance: 34%;
-  --secondary-background-color: hsl(0, 0%, 94%);
-  --secondary-background-color-light: hsl(0, 0%, 98%);
+  --primary-color-font-color: hsl(270, 8%, 95%);
 
-  --primary-background-color: hsl(
+  --primary-color: hsl(
     var(--primary-hue),
     var(--primary-saturation),
     var(--primary-luminance)
   );
-  --primary-background-color-light: hsl(
+  --primary-color-light: hsl(
     var(--primary-hue),
     var(--primary-saturation),
     calc(var(--primary-luminance) + 5%)
   );
-  --primary-background-color-lightest: hsl(
+  --primary-color-lightest: hsl(
     var(--primary-hue),
     var(--primary-saturation),
     calc(var(--primary-luminance) + 10%)
   );
-  --primary-background-color-disabled: hsla(
-    var(--primary-hue),
-    calc(var(--primary-saturation)),
-    calc(var(--primary-luminance)),
-    0.6
-  );
   --grid-cell-size: 2.5rem;
   --grid-border-size: 0.125rem;
+  --valid-marker-color: hsl(120, 78%, 73%);
+  --invalid-marker-color: hsl(3, 100%, 73%);
+}
+
+:root.light {
+  --secondary-background-color: hsl(0, 0%, 94%);
+  --secondary-background-color-light: hsl(0, 0%, 98%);
+  --footer-color: hsl(0, 0%, 10%);
+  --content-font-color: hsl(0, 0%, 0%);
+  --hit-marker-svg: url('../img/hit-marker.svg');
+  --miss-marker-svg: url('../img/miss-marker.svg');
   --grid-border-color: hsl(0, 0%, 12%);
   --grid-cell-color: hsl(0, 0%, 100%);
   --ship-cell-color: hsl(0, 0%, 55%);
-  --valid-marker-color: hsl(120, 78%, 72%);
-  --invalid-marker-color: hsl(3, 100%, 71%);
   --form-control-accent-color: hsl(213, 15%, 76%);
-  --error-color: hsl(0, 100%, 50%);
-  --input-focus-color: hsl(216, 100%, 49%);
+  --primary-red: hsl(0, 100%, 50%);
+}
+
+:root.dark {
+  --secondary-background-color: hsl(0, 0%, 9%);
+  --secondary-background-color-light: hsl(0, 0%, 11%);
+  --grid-border-color: hsl(0, 0%, 9%);
+  --grid-cell-color: hsl(0, 0%, 16%);
+  --ship-cell-color: hsl(0, 0%, 40%);
+  --form-control-accent-color: hsl(0, 0%, 6%);
+  --primary-red: hsl(0, 100%, 40%);
+  --footer-color: hsl(0, 0%, 6%);
+  --content-font-color: hsl(0, 0%, 80%);
+  --hit-marker-svg: url('../img/hit-marker-dark.svg');
+  --miss-marker-svg: url('../img/miss-marker-dark.svg');
 }
 
 body {
@@ -59,17 +73,17 @@ body {
 }
 
 .header {
-  background-color: var(--primary-background-color);
-  font-weight: 500;
+  background-color: var(--primary-color);
   display: flex;
-  font-size: 1.5rem;
-  padding: 1.25rem 6rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 6rem;
+  color: var(--primary-color-font-color);
 }
 
 .content {
   background-color: var(--content-background-color);
   flex-grow: 1;
-  color: black;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -83,12 +97,6 @@ body {
   column-gap: 2rem;
 }
 
-.gameplay-wrapper.active {
-  background-color: var(--secondary-background-color-light);
-  border-radius: 15px;
-  padding: 2rem;
-}
-
 .gameboard-wrapper {
   display: flex;
   flex-direction: column;
@@ -98,7 +106,8 @@ body {
 
 .player-name {
   display: none;
-  font-size: 1.2rem;
+  font-size: 1.3rem;
+  font-weight: 500;
 }
 
 .gameplay-wrapper.active .player-name {
@@ -127,13 +136,22 @@ body {
 }
 
 .hit-cell {
-  background: var(--grid-cell-color) url('../img/hit-marker.svg') center center
+  background: var(--grid-cell-color) var(--hit-marker-svg) center center
     no-repeat;
+  color: var(--primary-red);
 }
 
 .miss-cell {
-  background: var(--grid-cell-color) url('../img/miss-marker.svg') center center
+  background: var(--grid-cell-color) var(--miss-marker-svg) center center
     no-repeat;
+}
+
+.ship-cell {
+  background-color: var(--ship-cell-color);
+}
+
+.sunken {
+  background: var(--primary-red);
 }
 
 .ship-container {
@@ -198,8 +216,9 @@ body {
   justify-content: center;
   align-items: center;
   padding: 0.625rem;
-  background-color: hsl(0, 0%, 10%);
+  background-color: var(--footer-color);
   gap: 0.625rem;
+  color: var(--primary-color-font-color);
 }
 
 .github-banner svg:hover:not(:active) {
@@ -215,21 +234,22 @@ button {
   border: none;
   padding: 1rem 1rem;
   border-radius: 12px;
-  background: var(--primary-background-color);
-  color: white;
+  background: var(--primary-color);
+  color: var(--primary-color-font-color);
   box-shadow: 0px 1px 2px 0px var(--form-control-accent-color);
 }
 
 button:hover {
-  background: var(--primary-background-color-light);
+  background: var(--primary-color-light);
 }
 
 button:active {
-  background: var(--primary-background-color-lightest);
+  background: var(--primary-color-lightest);
 }
 
 button:disabled {
-  background: var(--primary-background-color-disabled);
+  background: var(--primary-color);
+  opacity: 0.5;
 }
 
 .content .buttons {
@@ -247,9 +267,14 @@ button:disabled {
   grid-template-areas:
     'board ships'
     'board form';
-  border-radius: 20px;
-  padding: 2rem 2rem;
   border: 1px solid var(--form-control-accent-color);
+}
+
+.gameplay-wrapper.active,
+.planning-modal[open] {
+  background-color: var(--secondary-background-color-light);
+  border-radius: 30px;
+  padding: 2rem;
 }
 
 .planning-modal > .gameboard {
@@ -283,10 +308,6 @@ fieldset {
   border: none;
 }
 
-legend {
-  border-bottom: 1px solid var(--form-control-accent-color);
-}
-
 form {
   grid-area: form;
   display: flex;
@@ -298,9 +319,18 @@ input {
   border: none;
 }
 
+label,
+legend,
+.player-name,
+.status,
+input {
+  color: var(--content-font-color);
+}
+
 input,
 #planning-ships {
   box-shadow: inset 0px 0px 2px 1px var(--form-control-accent-color);
+  background-color: var(--grid-cell-color);
 }
 
 .radio-control {
@@ -317,7 +347,7 @@ input,
 label[for='name']::after,
 legend::after {
   content: '*';
-  color: var(--error-color);
+  color: var(--primary-red);
 }
 
 input[type='radio'] {
@@ -333,7 +363,7 @@ input[type='radio']::before {
   width: 0.5em;
   height: 0.5em;
   border-radius: 50%;
-  box-shadow: inset 1em 1em var(--primary-background-color);
+  box-shadow: inset 1em 1em var(--primary-color);
   display: none;
 }
 
@@ -341,9 +371,9 @@ input[type='radio']:checked::before {
   display: block;
 }
 
-input:focus {
+input:focus-visible {
   outline: none;
-  box-shadow: inset 0px 0px 2px 1px var(--input-focus-color);
+  box-shadow: inset 0px 0px 2px 1px var(--primary-color);
 }
 
 #name {
@@ -353,11 +383,11 @@ input:focus {
 
 .invalid:not(#insertion-marker) {
   background-color: hsla(3, 100%, 71%, 0.265);
-  box-shadow: inset 0px 0px 2px 1px var(--error-color);
+  box-shadow: inset 0px 0px 2px 1px var(--primary-red);
 }
 
 .error {
-  color: var(--error-color);
+  color: var(--primary-red);
   flex-basis: 1.15rem;
 }
 
@@ -371,5 +401,61 @@ fieldset + .error {
 }
 
 input:disabled {
-  opacity: 0.5;
+  opacity: 0.3;
+}
+
+.dark-mode-toggle {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.toggle {
+  display: block;
+  position: relative;
+  width: 3.6rem;
+  height: 1.8rem;
+}
+
+.slider {
+  background-color: var(--secondary-background-color);
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.slider::before {
+  content: '';
+  background-color: white;
+  box-shadow: inset 0px 0px 2px 1px var(--form-control-accent-color);
+  border-radius: 50%;
+}
+
+#dark-mode:not(:checked) + .slider::before {
+  left: 0.2rem;
+}
+
+#dark-mode:checked + .slider::before {
+  right: 0.2rem;
+}
+
+.toggle-icon,
+.slider::before {
+  width: 1.4rem;
+  height: 1.4rem;
+  position: absolute;
+  z-index: 1;
+  top: 0.2rem;
+  pointer-events: none;
+}
+
+#dark-mode:not(:checked) ~ .toggle-icon {
+  background: url('../img/light-mode.svg') center no-repeat;
+  right: 0.2rem;
+}
+
+#dark-mode:checked ~ .toggle-icon {
+  background: url('../img/dark-mode.svg') center no-repeat;
+  left: 0.2rem;
 }
