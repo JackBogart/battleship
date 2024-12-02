@@ -150,8 +150,8 @@ export function createComputerPlayer() {
       const newCol = col + dCol;
 
       if (
-        isTileInBounds(row, col) &&
-        infoBoard[row][col] === tileInfoType.UNKNOWN
+        isTileInBounds(newRow, newCol) &&
+        infoBoard[newRow][newCol] === tileInfoType.UNKNOWN
       ) {
         const oppositeRow = row - dRow;
         const oppositeCol = col - dCol;
