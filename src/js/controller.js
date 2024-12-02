@@ -114,8 +114,15 @@ const receiveAttackHandler = function receiveAttackHandler(event) {
     const [computerRow, computerCol] = player2.getComputerAttack(
       player1.getInfoBoard(),
     );
-    player2.updateLastAttack(computerRow, computerCol);
     playerTurn(player1, computerRow, computerCol);
+
+    const attackedShip = player1.getShip(computerRow, computerCol);
+    player2.updateLastAttack(
+      computerRow,
+      computerCol,
+      attackedShip && attackedShip.isSunk(),
+      player1.getInfoBoard(),
+    );
   } else {
     const attackingPlayer = getPlayer(!isPlayer1Turn);
     view.renderReadyView(

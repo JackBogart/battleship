@@ -150,7 +150,6 @@ describe('computer player', () => {
       .fill(null)
       .map(() => new Array(10).fill(tileInfoType.UNKNOWN));
     infoBoard[3][5] = tileInfoType.HIT;
-    player.updateLastAttack(3, 5);
     shuffleArray.mockReturnValueOnce([
       [1, 0],
       [-1, 0],
@@ -158,9 +157,25 @@ describe('computer player', () => {
       [0, -1],
     ]);
 
+    player.updateLastAttack(3, 5, false, infoBoard);
     const [row, col] = player.getComputerAttack(infoBoard);
 
     expect(row).toBe(4);
     expect(col).toBe(5);
+  });
+
+  it('should try a random location when it has sunken a ship', () => {
+    const infoBoard = new Array(10)
+      .fill(null)
+      .map(() => new Array(10).fill(tileInfoType.UNKNOWN));
+    infoBoard[3][5] = tileInfoType.HIT;
+    getRandomInt.mockReturnValueOnce(2).mockReturnValueOnce(7);
+
+    player.updateLastAttack(3, 5, true, infoBoard);
+    const [row, col] = player.getComputerAttack(infoBoard);
+
+    expect(getRandomInt).toHaveBeenCalledTimes(2);
+    expect(row).toBe(2);
+    expect(col).toBe(7);
   });
 });

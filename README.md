@@ -2,7 +2,6 @@
 
 ### Todo
 
-- Add dark mode
 - Final UI review
   - Add messages about type of ship sunk
     - Maybe a smaller message above the status saying what happened?
@@ -11,8 +10,6 @@
   - Finalize planning modal
     - Add a title + info on placement
   - Feedback for users hovering over tiles they can attack?
-- Improve AI
-  - Can add all adjacent cells to a queue when an attack is a hit
 - Clean up the README to show off the project
 
 ### Known Bugs

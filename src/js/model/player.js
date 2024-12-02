@@ -92,35 +92,24 @@ export function createPlayer(name, playerType) {
 
 export function createComputerPlayer() {
   const player = createPlayer('Computer', playerType.COMPUTER);
-  let lastAttack;
+  let prioritizedTiles = [];
 
-  const getComputerAttack = function getComputerAttack(infoBoard) {
-    if (
-      lastAttack !== undefined &&
-      infoBoard[lastAttack.row][lastAttack.col] === tileInfoType.HIT
-    ) {
-      const directions = shuffleArray([
-        [0, 1],
-        [1, 0],
-        [-1, 0],
-        [0, -1],
-      ]);
+  const isTileInBounds = function isTileInBounds(row, col) {
+    return row >= 0 && row < NUM_OF_ROWS && col >= 0 && col < NUM_OF_COLUMNS;
+  };
 
-      for (const [dRow, dCol] of directions) {
-        const row = lastAttack.row + dRow;
-        const col = lastAttack.col + dCol;
-
-        if (
-          row >= 0 &&
-          row < NUM_OF_ROWS &&
-          col >= 0 &&
-          col < NUM_OF_COLUMNS &&
-          infoBoard[row][col] === tileInfoType.UNKNOWN
-        ) {
-          return [row, col];
-        }
+  const getPrioritizedTile = function getPrioritizedTile(infoBoard) {
+    while (prioritizedTiles.length > 0) {
+      const [row, col] = prioritizedTiles.pop();
+      if (infoBoard[row][col] === tileInfoType.UNKNOWN) {
+        return [row, col];
       }
     }
+
+    return null;
+  };
+
+  const getRandomTile = function getRandomTile(infoBoard) {
     let row = getRandomInt(10);
     let col = getRandomInt(10);
 
@@ -132,8 +121,71 @@ export function createComputerPlayer() {
     return [row, col];
   };
 
-  const updateLastAttack = function updateLastAttack(row, col) {
-    lastAttack = { row, col };
+  const getComputerAttack = function getComputerAttack(infoBoard) {
+    const prioritizedTile = getPrioritizedTile(infoBoard);
+
+    if (prioritizedTile) {
+      return prioritizedTile;
+    }
+
+    return getRandomTile(infoBoard);
+  };
+
+  const getTilesOrderedByPriority = function getTilesOrderedByPriority(
+    row,
+    col,
+    infoBoard,
+  ) {
+    const directions = shuffleArray([
+      [0, 1],
+      [1, 0],
+      [-1, 0],
+      [0, -1],
+    ]);
+
+    const tilesOrderedByPriority = [];
+
+    for (const [dRow, dCol] of directions) {
+      const newRow = row + dRow;
+      const newCol = col + dCol;
+
+      if (
+        isTileInBounds(row, col) &&
+        infoBoard[row][col] === tileInfoType.UNKNOWN
+      ) {
+        const oppositeRow = row - dRow;
+        const oppositeCol = col - dCol;
+
+        /* If the tile on the other side of the attacked tile is also a hit we
+        should keep attacking in this direction, therefore prioritize. */
+        if (
+          isTileInBounds(oppositeRow, oppositeCol) &&
+          infoBoard[oppositeRow][oppositeCol] === tileInfoType.HIT
+        ) {
+          tilesOrderedByPriority.push([newRow, newCol]);
+        } else {
+          tilesOrderedByPriority.unshift([newRow, newCol]);
+        }
+      }
+    }
+    return tilesOrderedByPriority;
+  };
+
+  const updateLastAttack = function updateLastAttack(
+    row,
+    col,
+    sunk,
+    infoBoard,
+  ) {
+    if (sunk) {
+      prioritizedTiles = [];
+    } else if (infoBoard[row][col] === tileInfoType.HIT) {
+      const tiles = getTilesOrderedByPriority(row, col, infoBoard);
+      prioritizedTiles.push(...tiles);
+    } else {
+      // We shuffle on miss as we don't want to keep attacking in same area
+      prioritizedTiles = shuffleArray(prioritizedTiles);
+    }
   };
 
   return { ...player, getComputerAttack, updateLastAttack };
