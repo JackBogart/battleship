@@ -35,6 +35,7 @@
   --grid-border-size: 0.125rem;
   --valid-marker-color: hsl(120, 78%, 73%);
   --invalid-marker-color: hsl(3, 100%, 73%);
+  --backdrop-color: hsla(0, 0%, 30%, 0.25);
 }
 
 :root.light {
@@ -46,6 +47,8 @@
   --miss-marker-svg: url('../img/miss-marker.svg');
   --grid-border-color: hsl(0, 0%, 12%);
   --grid-cell-color: hsl(0, 0%, 100%);
+  --grid-cell-color-secondary: hsl(0, 0%, 90%);
+  --close-button-active: hsl(0, 0%, 85%);
   --ship-cell-color: hsl(0, 0%, 55%);
   --form-control-accent-color: hsl(213, 15%, 76%);
   --primary-red: hsl(0, 100%, 50%);
@@ -56,6 +59,8 @@
   --secondary-background-color-light: hsl(0, 0%, 11%);
   --grid-border-color: hsl(0, 0%, 9%);
   --grid-cell-color: hsl(0, 0%, 16%);
+  --grid-cell-color-secondary: hsl(0, 0%, 21%);
+  --close-button-active: hsl(0, 0%, 25%);
   --ship-cell-color: hsl(0, 0%, 40%);
   --form-control-accent-color: hsl(0, 0%, 6%);
   --primary-red: hsl(0, 100%, 40%);
@@ -77,7 +82,7 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem 6rem;
+  padding: 0rem 6rem;
   color: var(--primary-color-font-color);
 }
 
@@ -232,6 +237,9 @@ body {
 button {
   appearance: none;
   border: none;
+}
+
+.btn {
   padding: 1rem 1rem;
   border-radius: 12px;
   background: var(--primary-color);
@@ -239,17 +247,23 @@ button {
   box-shadow: 0px 1px 2px 0px var(--form-control-accent-color);
 }
 
-button:hover {
+.btn:hover {
   background: var(--primary-color-light);
 }
 
-button:active {
+.btn:active {
   background: var(--primary-color-lightest);
+  box-shadow: inset 0px 0px 1px 1px var(--form-control-accent-color);
 }
 
-button:disabled {
+.btn:disabled {
   background: var(--primary-color);
   opacity: 0.5;
+}
+
+.planning-modal .buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .content .buttons {
@@ -262,12 +276,46 @@ button:disabled {
 .planning-modal[open] {
   display: grid;
   column-gap: 3rem;
-  grid-template-rows: 4fr 2fr;
+  grid-template-rows: 2.5fr 4fr 2fr;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:
+    'info info'
     'board ships'
     'board form';
-  border: 1px solid var(--form-control-accent-color);
+  border: none;
+  box-shadow: inset 0px 0px 1px 0px var(--form-control-accent-color);
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.close:hover {
+  background-color: var(--grid-cell-color-secondary);
+}
+
+.close:active {
+  background-color: var(--close-button-active);
+}
+
+.close > svg {
+  fill: var(--content-font-color);
+  pointer-events: none;
+}
+
+.planning-modal[open]::backdrop {
+  background-color: var(--backdrop-color);
 }
 
 .gameplay-wrapper.active,
@@ -277,15 +325,25 @@ button:disabled {
   padding: 2rem;
 }
 
+h2 {
+  margin: 0px;
+}
+
+.planning-info {
+  grid-area: info;
+  max-width: 56rem;
+}
+
 .planning-modal > .gameboard {
   grid-area: board;
-  place-self: center;
+  place-self: start center;
 }
 
 .ship-wrapper {
   grid-area: ships;
   display: flex;
   flex-direction: column;
+  align-content: start;
 }
 
 #planning-ships {
@@ -319,10 +377,8 @@ input {
   border: none;
 }
 
-label,
-legend,
-.player-name,
-.status,
+.content,
+.planning-modal,
 input {
   color: var(--content-font-color);
 }
@@ -342,6 +398,11 @@ input,
 
 .radio-control + .radio-control {
   margin-top: 0.2rem;
+}
+
+label[for='name'] {
+  padding-left: 0.4rem;
+  margin-bottom: 0.3rem;
 }
 
 label[for='name']::after,
@@ -420,6 +481,10 @@ input:disabled {
   cursor: pointer;
 }
 
+.slider:hover {
+  background-color: var(--secondary-background-color-light);
+}
+
 .slider::before {
   content: '';
   background-color: white;
@@ -453,4 +518,8 @@ input:disabled {
 #dark-mode:checked ~ .toggle-icon {
   background: url('../img/dark-mode.svg') center no-repeat;
   left: 0.2rem;
+}
+
+.gameboard-wrapper .grid-cell[class='grid-cell']:hover {
+  background-color: var(--grid-cell-color-secondary);
 }

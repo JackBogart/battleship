@@ -7,14 +7,7 @@
     - Maybe a smaller message above the status saying what happened?
     - Need to consider how it will look for computer games, should have a
       timeout set while the computer 'decides'
-  - Finalize planning modal
-    - Add a title + info on placement
-  - Feedback for users hovering over tiles they can attack?
 - Clean up the README to show off the project
-
-### Known Bugs
-
-- Look into why drag and drop API cursors aren't appearing without CSS
 
 ### Stretch Goals
 

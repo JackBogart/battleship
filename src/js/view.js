@@ -15,10 +15,7 @@ const createButton = function createButton(text, className) {
   const button = document.createElement('button');
   button.type = 'button';
   button.textContent = text;
-
-  if (className) {
-    button.classList.add(className);
-  }
+  button.classList.add('btn', className);
 
   return button;
 };
@@ -478,6 +475,10 @@ const isDarkModeToggled = function isDarkModeToggled() {
   return document.querySelector('#dark-mode').checked;
 };
 
+const closePlanningModal = function closePlanningModal() {
+  planningModal.close();
+};
+
 // Binders below
 const bindGameboards = function bindGameboardsHandlers(handlers) {
   [player1Board, player2Board].forEach((gameboard) => {
@@ -556,6 +557,8 @@ const bindModalButtons = function bindModalButtonHandlers(handlers) {
   planningModal.addEventListener('click', (event) => {
     if (event.target.classList.contains('randomize')) {
       handlers.randomize();
+    } else if (event.target.classList.contains('close')) {
+      handlers.close();
     }
   });
 };
@@ -609,6 +612,7 @@ export const view = {
   bindDarkModeToggle,
   toggleDarkMode,
   isDarkModeToggled,
+  closePlanningModal,
 };
 
 export function getXYOffsets(ship) {

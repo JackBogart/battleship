@@ -7,6 +7,20 @@
   </head>
   <body>
     <dialog class="planning-modal">
+      <div class="planning-info">
+        <h2>Planning</h2>
+        <p>
+          Man your stations, this is war! To prepare for battle, place your
+          ships on the planning board below.
+          <strong>Drag and drop</strong> ships from your shipyard onto the grid
+          below. Your choices aren't permanent, you can reposition as needed!
+        </p>
+        <p>
+          To rotate a ship, click on the ship after placing it on the board.
+          Keep in mind you can't rotate a ship if it results in an invalid
+          placement (i.e. out of bounds or overlapping another ship).
+        </p>
+      </div>
       <div class="gameboard"></div>
       <div class="ship-wrapper">
         <div id="planning-ships"></div>
@@ -56,14 +70,27 @@
         </div>
 
         <div class="buttons">
-          <button type="button" class="randomize">Randomize</button>
-          <button type="submit" class="submit-btn">Submit</button>
+          <button type="button" class="randomize btn">Randomize</button>
+          <button type="submit" class="submit-btn btn">Submit</button>
         </div>
       </form>
+      <button type="button" class="close">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          height="1.4rem"
+          viewBox="0 -960 960 960"
+          width="1.4rem"
+          fill="#000000"
+        >
+          <path
+            d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"
+          />
+        </svg>
+      </button>
     </dialog>
 
     <div class="header">
-      <h2>Battleship</h2>
+      <h1>Battleship</h1>
       <label for="dark-mode" class="toggle">
         <input
           type="checkbox"
@@ -84,7 +111,7 @@
           <div class="gameboard player-1"></div>
         </div>
         <div class="buttons">
-          <button type="button" class="start-game">Start Game</button>
+          <button type="button" class="start-game btn">Start Game</button>
         </div>
         <div class="gameboard-wrapper">
           <div class="player-name player-2"></div>

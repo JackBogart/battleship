@@ -364,6 +364,10 @@ const darkModeHandler = function darkModeToggleHandler() {
   localStorage.setItem('theme', newTheme);
 };
 
+const closeHandler = function closeHandler() {
+  view.closePlanningModal();
+};
+
 const run = function run() {
   // Gameboard interactions
   view.bindGameboards({
@@ -393,6 +397,7 @@ const run = function run() {
   view.bindModalButtons({
     randomize: randomizeShipsHandler,
     submit: submitHandler,
+    close: closeHandler,
   });
 
   // Form inputs
