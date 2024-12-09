@@ -301,6 +301,7 @@ button {
   border: none;
   box-shadow: inset 0px 0px 1px 0px var(--form-control-accent-color);
   position: relative;
+  max-height: 42rem;
 }
 
 .close {
