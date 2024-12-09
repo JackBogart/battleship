@@ -369,6 +369,12 @@ const closeHandler = function closeHandler() {
   view.closePlanningModal();
 };
 
+const concedeHandler = function concedeHandler() {
+  const opponent = getPlayer(!isPlayer1Turn);
+  view.renderGameOver(!isPlayer1Turn, opponent);
+  isGameInProgress = false;
+};
+
 const run = function run() {
   // Gameboard interactions
   view.bindGameboards({
@@ -380,6 +386,7 @@ const run = function run() {
   view.bindButtons({
     start: startGameHandler,
     ready: readyHandler,
+    concede: concedeHandler,
   });
 
   // Drag-and-drop interactions

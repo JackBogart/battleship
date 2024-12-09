@@ -368,11 +368,11 @@ const getFormData = function getFormData() {
   };
 };
 
-const renderGameOver = function renderGameOver(isPlayer1, attackingPlayer) {
-  setStatusMessage(`${attackingPlayer.getName()} wins!`);
+const renderGameOver = function renderGameOver(isPlayer1, winningPlayer) {
+  setStatusMessage(`${winningPlayer.getName()} wins!`);
   setGameplayButtons(createButton('Play Again', 'play-again'));
 
-  renderPlayerShips(isPlayer1, attackingPlayer);
+  renderPlayerShips(isPlayer1, winningPlayer);
 };
 
 const resetPlanningFormData = function resetPlanningFormData() {
@@ -415,27 +415,32 @@ const renderComputerGame = function renderComputerGame(
 ) {
   renderGameplayBoards(player1Name, player2Name);
   renderPlayerShips(true, player1);
-  setGameplayButtons();
+  setGameplayButtons(createButton('Concede', 'concede'));
 };
 
 const renderPlayerGame = function renderPlayerGame(player1Name, player2Name) {
   renderGameplayBoards(player1Name, player2Name);
-  setGameplayButtons(createButton('Ready', 'ready'));
+
+  const concedeBtn = createButton('Concede', 'concede');
+  concedeBtn.disabled = true;
+  setGameplayButtons(createButton('Ready', 'ready'), concedeBtn);
   setStatusPlayersTurn(player1Name);
 };
 
 const renderReadyView = function renderReadyView(
   isPlayer1,
-  attackingPlayer,
-  attackedPlayerName,
+  lastPlayer,
+  currentPlayerName,
 ) {
   document.querySelector('.ready').disabled = false;
-  setStatusPlayersTurn(attackedPlayerName);
-  hidePlayerShips(isPlayer1, attackingPlayer);
+  document.querySelector('.concede').disabled = true;
+  setStatusPlayersTurn(currentPlayerName);
+  hidePlayerShips(isPlayer1, lastPlayer);
 };
 
 const renderActivePlayer = function renderActivePlayer(isPlayer1Turn, player) {
   document.querySelector('.ready').disabled = true;
+  document.querySelector('.concede').disabled = false;
   setStatusMessage(`Waiting for ${player.getName()} to attack...`);
   renderPlayerShips(isPlayer1Turn, player);
 };
@@ -496,6 +501,8 @@ const bindButtons = function bindGameplayButtonHandlers(handlers) {
       handlers.start();
     } else if (event.target.classList.contains('ready')) {
       handlers.ready();
+    } else if (event.target.classList.contains('concede')) {
+      handlers.concede();
     }
   });
 };
