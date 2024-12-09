@@ -181,6 +181,7 @@ const shipsDragoverHandler = function shipsDragoverHandler(event) {
   }
 
   event.preventDefault();
+  event.dataTransfer.dropEffect = 'move';
 };
 
 const gapDragoverHandler = function boardGapDragoverHandler() {

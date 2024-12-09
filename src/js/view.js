@@ -33,8 +33,7 @@ const createGridCell = function createGridCellElement(row, col) {
   cell.dataset.row = row;
   cell.dataset.col = col;
   cell.classList.add('grid-cell');
-  cell.style.gridRow = `${row + 1} / ${row + 2}`;
-  cell.style.gridColumn = `${col + 1} / ${col + 2}`;
+  cell.style.gridArea = `${row + 1} / ${col + 1} / span 1 / span 1`;
   return cell;
 };
 
@@ -135,14 +134,17 @@ const setShipSize = function setShipContainerSize(
   isVertical,
   length,
 ) {
+  shipElement.style.gridRowStart = `${row + 1}`;
+  shipElement.style.gridColumnStart = `${col + 1}`;
+
   if (isVertical) {
     shipElement.classList.add('vertical');
-    shipElement.style.gridRow = `${row + 1} / span ${length}`;
-    shipElement.style.gridColumn = `${col + 1} / span 1`;
+    shipElement.style.gridRowEnd = `span ${length}`;
+    shipElement.style.gridColumnEnd = 'span 1';
   } else {
     shipElement.classList.remove('vertical');
-    shipElement.style.gridRow = `${row + 1} / span 1`;
-    shipElement.style.gridColumn = `${col + 1} / span ${length}`;
+    shipElement.style.gridRowEnd = 'span 1';
+    shipElement.style.gridColumnEnd = `span ${length}`;
   }
 };
 
@@ -208,7 +210,6 @@ const createShipInsertionMarker = function createShipInsertionMarker(
 ) {
   const marker = shipElement.cloneNode(true);
   marker.id = 'insertion-marker';
-  marker.style.display = 'none';
   marker.draggable = false;
   marker.classList.remove('planning-ship');
 
@@ -244,7 +245,7 @@ const moveShipInsertionMarker = function moveShipInsertionMarker(
   isVertical,
 ) {
   const marker = document.querySelector('#insertion-marker');
-  marker.style.display = '';
+  marker.classList.add('active');
 
   const computedStyle = window.getComputedStyle(marker);
   const currentRowStart = Number(computedStyle.gridRowStart);
@@ -283,8 +284,7 @@ const getActiveDragImageType = function getActiveDragImageType() {
 };
 
 const hideShipInsertionMarker = function hideShipInsertionMarker() {
-  const marker = document.querySelector('#insertion-marker');
-  marker.style.display = 'none';
+  document.querySelector('#insertion-marker').classList.remove('active');
 };
 
 const returnShip = function returnShipToSelectionArea(type, length) {
@@ -305,8 +305,6 @@ const showGameplayBoards = function showGameplayBoards(
   player1Name,
   player2Name,
 ) {
-  player1Board.style.display = 'grid';
-  player2Board.style.display = 'grid';
   document.querySelector('.gameplay-wrapper').classList.add('active');
   document.querySelector('.player-1.player-name').textContent = player1Name;
   document.querySelector('.player-2.player-name').textContent = player2Name;
@@ -447,17 +445,10 @@ const renderShipDragStart = function renderShipDragStart(
   dragImage,
 ) {
   createShipInsertionMarker(shipContainer);
-
-  document.querySelectorAll('.ship-container').forEach((ship) => {
-    ship.style.pointerEvents = 'none';
-  });
   dragImage.classList.add('active');
 };
 
 const renderShipDragEnd = function renderShipDragEnd() {
-  document.querySelectorAll('.ship-container').forEach((ship) => {
-    ship.style.pointerEvents = 'auto';
-  });
   document.querySelector('#insertion-marker').remove();
   getActiveDragImage().classList.remove('active');
 };
